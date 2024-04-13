@@ -2,18 +2,49 @@
   "name": "sdp2",
   "version": "1.0.0",
   "description": "a b2b portal",
-  "main": "index.js",
+  "main": "src/index.js",
   "repository": "https://github.com/HoGentProjectenII/2024-backend-vc02-24.git",
   "author": "Peter Cypers <peter.cypers@student.hogent.be>",
   "license": "MIT",
   "private": true,
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "env-cmd nodemon",
+    "test": "jest"
   },
   "dependencies": {
-    "koa": "^2.15.3"
+    "@koa/cors": "^5.0.0",
+    "@koa/router": "^12.0.1",
+    "argon2": "^0.40.1",
+    "config": "^3.3.11",
+    "joi": "^17.12.3",
+    "jsonwebtoken": "^9.0.2",
+    "knex": "^3.1.0",
+    "koa": "^2.15.3",
+    "koa-bodyparser": "^4.4.1",
+    "koa-helmet": "^7.0.2",
+    "mysql2": "^3.9.4",
+    "node-emoji": "1.11.0",
+    "winston": "^3.13.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.0"
+    "env-cmd": "^10.1.0",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0",
+    "supertest": "^6.3.4"
+  },
+  "nodemonConfig": {
+    "signal": "SIGTERM",
+    "ignore": [
+      "node_modules/*",
+      ".vscode/*"
+    ],
+    "delay": "80",
+    "watch": [
+      "config",
+      "src"
+    ],
+    "ext": "js,json",
+    "legacyWatch": true,
+    "exec": "node --inspect=0.0.0.0:9001 --trace-warnings src/index.js"
   }
 }
