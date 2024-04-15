@@ -17,11 +17,15 @@ const getById = (id) => {
   // return getKnex()(tables.gebruiker).where('GEBRUIKERID', id).first();
 };
 
+const getByEmail = (email) => {
+  return mockData.find(g => g.EMAILADRES == email)
+}
+
 const create = async ({
   emailadres, wachtwoord, naam, rol, isActief
 }) => {
   
-  return mockData.push({
+  const gebruiker = mockData.push({
     GEBRUIKERID: mockData.length,
     EMAILADRES: emailadres,
     WACHTWOORD: wachtwoord,
@@ -29,6 +33,8 @@ const create = async ({
     ROL: rol,
     ISACTIEF: isActief,
   })
+
+  return mockData.length-1;
   // try {
   //   const [id] = await getKnex()(tables.user).insert({
   //     rol, emailadres, isActief, naam, wachtwoord
@@ -97,6 +103,7 @@ const deleteById = async (id) => {
 module.exports = {
   getAll,
   getById,
+  getByEmail,
   create,
   updateById,
   deleteById,
