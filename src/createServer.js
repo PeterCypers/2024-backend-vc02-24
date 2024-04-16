@@ -1,8 +1,8 @@
 const config = require('config');
 const Koa = require('koa');
 const { initializeLogger, getLogger } = require('./core/logging');
-const installRest = require('./rest'); //TODO : enkel health-check route bestaat
-// const { initializeData, shutdownData } = require('./data'); //TODO
+const installRest = require('./rest');
+const { initializeData, shutdownData } = require('./data'); //TODO
 const installMiddleware = require('./core/installMiddleware');
 
 const NODE_ENV = config.get('env');
@@ -18,13 +18,13 @@ module.exports = async function createServer() {
     },
   });
 
-//   await initializeData(); //TODO
+  await initializeData();
 
   const app = new Koa();
 
   installMiddleware(app);
 
-  installRest(app); //TODO : enkel health-check route bestaat
+  installRest(app);
 
   return {
     getApp() {
