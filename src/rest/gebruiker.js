@@ -58,6 +58,7 @@ const register = async (ctx) => {
 };
 register.validationScheme = {
   body: {
+    id: Joi.number().integer().positive(),
     emailadres: Joi.string().email(),
     wachtwoord: Joi.string().max(255),
     naam: Joi.string().max(255),
@@ -107,7 +108,6 @@ module.exports = function installGebruikerRouter(app) {
   );
 
   // authentication routes
-
   router.get(
     '/:id',
     requireAuthentication,
@@ -117,7 +117,6 @@ module.exports = function installGebruikerRouter(app) {
   );
 
   // admin routes
-
   const requireAdmin = makeRequireRole(Role.ADMINISTRATOR);
   router.get(
     '/',

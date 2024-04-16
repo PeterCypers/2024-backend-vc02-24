@@ -94,9 +94,10 @@ const getById = async (id) => {
   return makeExposedGebruiker(gebruiker);
 };
 
-const register = async ({ emailadres, wachtwoord, naam, rol, isActief }) => {
+const register = async ({ id, emailadres, wachtwoord, naam, rol, isActief }) => {
   try {
     const gebruikerId = await gebruikerRepository.create({
+      id,
       emailadres,
       wachtwoord,
       naam,
