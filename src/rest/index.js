@@ -1,8 +1,8 @@
-const Router = require('@koa/router');
-const installHealthRouter = require('./health');
-const installGebruikerRouter = require('./gebruiker');
+const Router = require("@koa/router");
+const installHealthRouter = require("./health");
+const installGebruikerRouter = require("./gebruiker");
+const installProductRouter = require("./products");
 //TODO : hier komen andere routes naar de DB-data vb gebruiker/product/bedrijf/etc
-
 
 /**
  * Install all routes in the given Koa application.
@@ -11,11 +11,12 @@ const installGebruikerRouter = require('./gebruiker');
  */
 module.exports = (app) => {
   const router = new Router({
-    prefix: '/api',
+    prefix: "/api",
   });
 
   installHealthRouter(router);
   installGebruikerRouter(router);
+  installProductRouter(router);
 
   app.use(router.routes()).use(router.allowedMethods());
 };
