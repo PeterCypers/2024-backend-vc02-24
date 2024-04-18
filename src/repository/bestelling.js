@@ -1,12 +1,24 @@
 const { getLogger } = require("../core/logging");
 const { tables, getKnex } = require("../data");
 
-const getAll = () => {
-  return getKnex()(tables.bestelling).select().orderBy("ORDERID", "DESC");
+const getAll = async (gebruikerId) => {
+  const bestellingen = getKnex()(tables.bestelling)
+    .select()
+    .orderBy("ORDERID", "DESC")
+    .where("KLANT_GEBRUIKERID", gebruikerId)
+    .orWhere("LEVERANCIER_GEBRUIKERID", gebruikerId);
+
+  return bestellingen;
 };
 
-const getById = (id) => {
-  return getKnex()(tables.bestelling).where("ORDERID", id).first();
+const getById = (id, gebruikerId) => {
+  const bestelling = getKnex()(tables.bestelling)
+    .where("KLANT_GEBRUIKERID", gebruikerId)
+    .orWhere("LEVERANCIER_GEBRUIKERID", gebruikerId)
+    .andWhere("ORDERID", id)
+    .first();
+
+  return bestelling;
 };
 
 const create = async ({
