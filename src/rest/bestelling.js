@@ -3,9 +3,7 @@ const bestellingService = require("../service/bestelling");
 const { requireAuthentication } = require("../core/auth");
 
 const getAll = async (ctx) => {
-  const { gebruikerId } = Number(
-    ctx.params.gebruikerId
-  ); /** ctx.state.session? */
+  const { gebruikerId } = ctx.state.session;
   ctx.body = await bestellingService.getAll(gebruikerId);
 };
 

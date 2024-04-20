@@ -17,7 +17,10 @@ const getById = async (id, gebruikerId) => {
     bestelling.KLANT_GEBRUIKERID !== gebruikerId ||
     bestelling.LEVERANCIER_GEBRUIKERID !== gebruikerId
   ) {
-    throw ServiceError.notFound(`Geen bestelling met id ${id}`, { id });
+    throw ServiceError.notFound(
+      `Geen bestelling met id ${id} voor klant/leverancier ${gebruikerId}`,
+      { id, gebruikerId }
+    );
   }
 
   return bestelling;

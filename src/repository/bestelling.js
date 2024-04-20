@@ -4,9 +4,9 @@ const { tables, getKnex } = require("../data");
 const getAll = async (gebruikerId) => {
   const bestellingen = getKnex()(tables.bestelling)
     .select()
-    .orderBy("ORDERID", "DESC")
     .where("KLANT_GEBRUIKERID", gebruikerId)
-    .orWhere("LEVERANCIER_GEBRUIKERID", gebruikerId);
+    .orWhere("LEVERANCIER_GEBRUIKERID", gebruikerId)
+    .orderBy("ORDERID", "DESC");
 
   return bestellingen;
 };
@@ -14,6 +14,7 @@ const getAll = async (gebruikerId) => {
 const getById = (id, gebruikerId) => {
   const bestelling = getKnex()(tables.bestelling)
     .where("KLANT_GEBRUIKERID", gebruikerId)
+    .andWhere("ORDERID", id)
     .orWhere("LEVERANCIER_GEBRUIKERID", gebruikerId)
     .andWhere("ORDERID", id)
     .first();
