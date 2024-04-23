@@ -26,19 +26,19 @@ async function initializeData() {
     connection: {
       host: DATABASE_HOST,
       port: DATABASE_PORT,
-      name: DATABASE_NAME,
+      // name: DATABASE_NAME,
       user: DATABASE_USERNAME,
       password: DATABASE_PASSWORD,
       insecureAuth: isDevelopment,
     },
     debug: isDevelopment,
-    // migrations: {
-    //   tableName: 'knex_meta',
-    //   directory: join('src', 'data', 'migrations'),
-    // },
-    // seeds: {
-    //   directory: join('src', 'data', 'seeds'),
-    // },
+    migrations: {
+      tableName: 'knex_meta',
+      directory: join('src', 'data', 'migrations'),
+    },
+    seeds: {
+      directory: join('src', 'data', 'seeds'),
+    },
   };
 
   knexInstance = knex(knexOptions);
@@ -60,17 +60,17 @@ async function initializeData() {
     throw new Error('Could not initialize the data layer');
   }
 
-//   // Run migrations
-//   try {
-//     await knexInstance.migrate.latest();
-//   } catch (error) {
-//     logger.error('Error while migrating the database', {
-//       error,
-//     });
+  // Run migrations
+  try {
+    await knexInstance.migrate.latest();
+  } catch (error) {
+    logger.error('Error while migrating the database', {
+      error,
+    });
 
-//     // No point in starting the server when migrations failed
-//     throw new Error('Migrations failed, check the logs');
-//   }
+    // No point in starting the server when migrations failed
+    throw new Error('Migrations failed, check the logs');
+  }
 
 //   if (isDevelopment) {
 //     try {
@@ -105,11 +105,11 @@ async function shutdownData() {
 
   logger.info('Database connection closed');
 }
-
+//lowercase gemaakt TODO: kan dit kwaad?
 const tables = Object.freeze({
-  gebruiker: 'GEBRUIKER',
-  product: 'PRODUCT',
-  bestelling: 'BESTELLING',
+  gebruiker: 'gebruiker',
+  product: 'product',
+  bestelling: 'bestelling',
 });
 
 module.exports = {
