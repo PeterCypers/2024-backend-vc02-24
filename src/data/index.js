@@ -13,7 +13,7 @@ const DATABASE_NAME = config.get('database.name');
 const DATABASE_HOST = config.get('database.host');
 const DATABASE_PORT = config.get('database.port');
 const DATABASE_USERNAME = config.get('database.username');
-const DATABASE_PASSWORD = config.get('database.password');
+const DATABASE_PASSWORD = config.has('database.password') ? config.get('database.password') : '';
 
 let knexInstance;
 
