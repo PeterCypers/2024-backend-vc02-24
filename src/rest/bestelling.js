@@ -11,14 +11,13 @@ const getById = async (ctx) => {
   const { gebruikerId } = ctx.state.session;
   ctx.body = await bestellingService.getById(
     Number(ctx.params.id),
-    gebruikerId
+    Number(gebruikerId)
   );
 };
 
 const create = async (ctx) => {
-  ctx.body = await bestellingService.create({
-    ...ctx.request.body,
-  });
+  ctx.body = await bestellingService.create({ ...ctx.request.body });
+  console.log(ctx.request.body);
 };
 
 const updateById = async (ctx) => {

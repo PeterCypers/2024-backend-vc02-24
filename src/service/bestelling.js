@@ -14,8 +14,8 @@ const getById = async (id, gebruikerId) => {
 
   if (
     !bestelling ||
-    bestelling.KLANT_GEBRUIKERID !== gebruikerId ||
-    bestelling.LEVERANCIER_GEBRUIKERID !== gebruikerId
+    (bestelling.KLANT_GEBRUIKERID !== gebruikerId &&
+      bestelling.LEVERANCIER_GEBRUIKERID !== gebruikerId)
   ) {
     throw ServiceError.notFound(
       `Geen bestelling met id ${id} voor klant/leverancier ${gebruikerId}`,
@@ -27,25 +27,25 @@ const getById = async (id, gebruikerId) => {
 };
 
 const create = async ({
-  orderId,
-  betalingstatus,
-  betalingsdatum,
-  datumGeplaatst,
-  herinneringsdatum,
-  orderstatus,
-  klant_gebruikerId,
-  leverancier_gebruikerId,
+  ORDERID,
+  BETALINGSTATUS,
+  BETALINGSDATUM,
+  DATUMGEPLAATST,
+  HERINNERINGSDATUM,
+  ORDERSTATUS,
+  KLANT_GEBRUIKERID,
+  LEVERANCIER_GEBRUIKERID,
 }) => {
   try {
     await bestellingRepository.create({
-      orderId,
-      betalingstatus,
-      betalingsdatum,
-      datumGeplaatst,
-      herinneringsdatum,
-      orderstatus,
-      klant_gebruikerId,
-      leverancier_gebruikerId,
+      ORDERID,
+      BETALINGSTATUS,
+      BETALINGSDATUM,
+      DATUMGEPLAATST,
+      HERINNERINGSDATUM,
+      ORDERSTATUS,
+      KLANT_GEBRUIKERID,
+      LEVERANCIER_GEBRUIKERID,
     });
   } catch (error) {
     throw error;
@@ -55,26 +55,25 @@ const create = async ({
 const updateById = async (
   id,
   {
-    betalingstatus,
-    betalingsdatum,
-    datumGeplaatst,
-    herinneringsdatum,
-    orderstatus,
-    klant_gebruikerId,
-    leverancier_gebruikerId,
+    BETALINGSTATUS,
+    BETALINGSDATUM,
+    DATUMGEPLAATST,
+    HERINNERINGSDATUM,
+    ORDERSTATUS,
+    KLANT_GEBRUIKERID,
+    LEVERANCIER_GEBRUIKERID,
   }
 ) => {
   try {
     await bestellingRepository.updateById(id, {
-      betalingstatus,
-      betalingsdatum,
-      datumGeplaatst,
-      herinneringsdatum,
-      orderstatus,
-      klant_gebruikerId,
-      leverancier_gebruikerId,
+      BETALINGSTATUS,
+      BETALINGSDATUM,
+      DATUMGEPLAATST,
+      HERINNERINGSDATUM,
+      ORDERSTATUS,
+      KLANT_GEBRUIKERID,
+      LEVERANCIER_GEBRUIKERID,
     });
-    return getById(id);
   } catch (error) {
     throw error;
   }

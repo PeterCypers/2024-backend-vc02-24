@@ -18,30 +18,39 @@ const getById = (id, gebruikerId) => {
     .orWhere("LEVERANCIER_GEBRUIKERID", gebruikerId)
     .andWhere("ORDERID", id)
     .first();
+  // const bestelling = getKnex()(tables.bestelling)
+  //   .where("ORDERID", id)
+  //   .andWhere(function () {
+  //     this.where("KLANT_GEBRUIKERID", gebruikerId).orWhere(
+  //       "LEVERANCIER_GEBRUIKERID",
+  //       gebruikerId
+  //     );
+  //   })
+  //   .first();
 
   return bestelling;
 };
 
 const create = async ({
-  orderId,
-  betalingstatus,
-  betalingsdatum,
-  datumGeplaatst,
-  herinneringsdatum,
-  orderstatus,
-  klant_gebruikerId,
-  leverancier_gebruikerId,
+  ORDERID,
+  BETALINGSTATUS,
+  BETALINGSDATUM,
+  DATUMGEPLAATST,
+  HERINNERINGSDATUM,
+  ORDERSTATUS,
+  KLANT_GEBRUIKERID,
+  LEVERANCIER_GEBRUIKERID,
 }) => {
   try {
     await getKnex()(tables.bestelling).insert({
-      ORDERID: orderId,
-      BETALINGSTATUS: betalingstatus,
-      BETALINGSDATUM: betalingsdatum,
-      DATUMGEPLAATS: datumGeplaatst,
-      HERINNERINGSDATUM: herinneringsdatum,
-      ORDERSTATUS: orderstatus,
-      KLANT_GEBRUIKERID: klant_gebruikerId,
-      LEVERANCIER_GEBRUIKERID: leverancier_gebruikerId,
+      ORDERID: ORDERID,
+      BETALINGSTATUS: BETALINGSTATUS,
+      BETALINGSDATUM: BETALINGSDATUM,
+      DATUMGEPLAATST: DATUMGEPLAATST,
+      HERINNERINGSDATUM: HERINNERINGSDATUM,
+      ORDERSTATUS: ORDERSTATUS,
+      KLANT_GEBRUIKERID: KLANT_GEBRUIKERID,
+      LEVERANCIER_GEBRUIKERID: LEVERANCIER_GEBRUIKERID,
     });
   } catch (error) {
     getLogger().error("Error in bestelling.create", {
@@ -54,25 +63,25 @@ const create = async ({
 const updateById = async (
   id,
   {
-    betalingstatus,
-    betalingsdatum,
-    datumGeplaatst,
-    herinneringsdatum,
-    orderstatus,
-    klant_gebruikerId,
-    leverancier_gebruikerId,
+    BETALINGSTATUS,
+    BETALINGSDATUM,
+    DATUMGEPLAATST,
+    HERINNERINGSDATUM,
+    ORDERSTATUS,
+    KLANT_GEBRUIKERID,
+    LEVERANCIER_GEBRUIKERID,
   }
 ) => {
   try {
     await getKnex()(tables.bestelling)
       .update({
-        BETALINGSTATUS: betalingstatus,
-        BETALINGSDATUM: betalingsdatum,
-        DATUMGEPLAATS: datumGeplaatst,
-        HERINNERINGSDATUM: herinneringsdatum,
-        ORDERSTATUS: orderstatus,
-        KLANT_GEBRUIKERID: klant_gebruikerId,
-        LEVERANCIER_GEBRUIKERID: leverancier_gebruikerId,
+        BETALINGSTATUS: BETALINGSTATUS,
+        BETALINGSDATUM: BETALINGSDATUM,
+        DATUMGEPLAATST: DATUMGEPLAATST,
+        HERINNERINGSDATUM: HERINNERINGSDATUM,
+        ORDERSTATUS: ORDERSTATUS,
+        KLANT_GEBRUIKERID: KLANT_GEBRUIKERID,
+        LEVERANCIER_GEBRUIKERID: LEVERANCIER_GEBRUIKERID,
       })
       .where("ORDERID", id);
   } catch (error) {
