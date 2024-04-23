@@ -60,16 +60,18 @@ async function initializeData() {
     throw new Error('Could not initialize the data layer');
   }
 
-  // Run migrations
-  try {
-    await knexInstance.migrate.latest();
-  } catch (error) {
-    logger.error('Error while migrating the database', {
-      error,
-    });
+  // Run migrations (enkel in test-omgeving)
+  if(NODE_ENV === 'test'){
+    try {
+      await knexInstance.migrate.latest();
+    } catch (error) {
+      logger.error('Error while migrating the database', {
+        error,
+      });
 
-    // No point in starting the server when migrations failed
-    throw new Error('Migrations failed, check the logs');
+      // No point in starting the server when migrations failed
+      throw new Error('Migrations failed, check the logs');
+    }
   }
 
 //   if (isDevelopment) {
@@ -105,11 +107,11 @@ async function shutdownData() {
 
   logger.info('Database connection closed');
 }
-//lowercase gemaakt TODO: kan dit kwaad?
+//dit moet in uppercase blijven staan -> java populate_DB
 const tables = Object.freeze({
-  gebruiker: 'gebruiker',
-  product: 'product',
-  bestelling: 'bestelling',
+  gebruiker: 'GEBRUIKER',
+  product: 'PRODUCT',
+  bestelling: 'BESTELLING',
 });
 
 module.exports = {
