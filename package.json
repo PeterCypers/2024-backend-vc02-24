@@ -9,7 +9,8 @@
   "private": true,
   "scripts": {
     "start": "env-cmd nodemon",
-    "test": "jest"
+    "test": "env-cmd -f .env.test jest --runInBand",
+    "test:coverage": "env-cmd -f .env.test jest --runInBand --coverage"
   },
   "dependencies": {
     "@koa/cors": "^5.0.0",
