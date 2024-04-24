@@ -2,6 +2,7 @@ const Router = require("@koa/router");
 const installHealthRouter = require("./health");
 const installGebruikerRouter = require("./gebruiker");
 const installProductRouter = require("./products");
+const installBestellingRouter = require("./bestelling");
 //TODO : hier komen andere routes naar de DB-data vb gebruiker/product/bedrijf/etc
 
 /**
@@ -17,6 +18,7 @@ module.exports = (app) => {
   installHealthRouter(router);
   installGebruikerRouter(router);
   installProductRouter(router);
+  installBestellingRouter(router);
 
   app.use(router.routes()).use(router.allowedMethods());
 };
