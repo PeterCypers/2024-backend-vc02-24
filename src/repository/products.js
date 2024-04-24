@@ -1,9 +1,7 @@
 const { tables, getKnex } = require("../data/index");
 
 const findAll = () => {
-  return getKnex()(tables.product)
-    .select("NAAM", "EENHEIDSPRIJS")
-    .orderBy("EENHEIDSPRIJS", "ASC");
+  return getKnex()(tables.product).select("*");
 };
 
 const findById = (id) => {
