@@ -2,10 +2,10 @@ const bestellingRepository = require("../repository/bestelling");
 const ServiceError = require("../core/serviceError");
 
 const getAll = async (gebruikerId) => {
-  const bestellingen = await bestellingRepository.getAll(gebruikerId);
+  const items = await bestellingRepository.getAll(gebruikerId);
   return {
-    count: bestellingen.length,
-    bestellingen,
+    count: items.length,
+    items,
   };
 };
 
