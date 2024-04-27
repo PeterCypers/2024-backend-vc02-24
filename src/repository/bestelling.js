@@ -32,6 +32,11 @@ const SELECT_COLUMS = [
   `b2.LOGO as LEVERANCIER_BEDRIJF_LOGO`,
   `b2.REKENINGNUMMER as LEVERANCIER_BEDRIJF_REKENINGNUMMER`,
   `b2.SECTOR as LEVERANCIER_BEDRIJF_SECTOR`,
+
+  `${tables.product}.NAAM as PRODUCT_NAAM`,
+  `${tables.product}.EENHEIDSPRIJS as PRODUCT_EENHEIDSPRIJS`,
+  `${tables.product}.STOCK as PRODUCT_STOCK`,
+  `${tables.besteldProduct}.AANTAL as PRODUCT_AANTAL`,
 ];
 
 const formatBestelling = ({
@@ -58,6 +63,11 @@ const formatBestelling = ({
   LEVERANCIER_BEDRIJF_LOGO,
   LEVERANCIER_BEDRIJF_REKENINGNUMMER,
   LEVERANCIER_BEDRIJF_SECTOR,
+
+  PRODUCT_NAAM,
+  PRODUCT_EENHEIDSPRIJS,
+  PRODUCT_STOCK,
+  PRODUCT_AANTAL,
   ...rest
 }) => ({
   ...rest,
@@ -87,6 +97,14 @@ const formatBestelling = ({
     LEVERANCIER_BEDRIJF_REKENINGNUMMER: LEVERANCIER_BEDRIJF_REKENINGNUMMER,
     LEVERANCIER_BEDRIJF_SECTOR: LEVERANCIER_BEDRIJF_SECTOR,
   },
+  product: [
+    {
+      PRODUCT_NAAM: PRODUCT_NAAM,
+      PRODUCT_EENHEIDSPRIJS: PRODUCT_EENHEIDSPRIJS,
+      PRODUCT_STOCK: PRODUCT_STOCK,
+      PRODUCT_AANTAL: PRODUCT_AANTAL,
+    },
+  ],
 });
 
 const getAll = async (gebruikerId) => {
@@ -121,6 +139,24 @@ const getAll = async (gebruikerId) => {
       `u2.GEBRUIKERID`,
       "=",
       `b2.LEVERANCIER_GEBRUIKERID`
+    )
+    .join(
+      tables.bestelling_besteldProduct,
+      `${tables.bestelling}.ORDERID`,
+      "=",
+      `${tables.bestelling_besteldProduct}.Bestelling_ORDERID`
+    )
+    .join(
+      tables.besteldProduct,
+      `${tables.bestelling_besteldProduct}.producten_BESTELDPRODUCTID`,
+      "=",
+      `${tables.besteldProduct}.BESTELDPRODUCTID`
+    )
+    .join(
+      tables.product,
+      `${tables.besteldProduct}.PRODUCT_PRODUCTID`,
+      "=",
+      `${tables.product}.PRODUCTID`
     )
     .where(`${tables.bestelling}.KLANT_GEBRUIKERID`, gebruikerId)
     .orWhere(`${tables.bestelling}.LEVERANCIER_GEBRUIKERID`, gebruikerId)
