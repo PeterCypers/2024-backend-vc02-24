@@ -17,7 +17,7 @@ const data = {
 
 const dataToDelete = {
     products: [1, 2, 3, 4, 5],
-}
+};
 
 describe("Products", () => {
     let server;
@@ -35,7 +35,7 @@ describe("Products", () => {
         await server.stop();
     });
 
-    //test get alle producten TODO: get all geeft nu gefilterde products terug(NAAM, EENHEIDSPRIJS), moet op een apart get-request komen
+    //test get alle producten
     const url = '/api/products';
     describe('GET /api/products', ()=> {
 
@@ -48,7 +48,7 @@ describe("Products", () => {
             await knex(tables.product).whereIn('productid', dataToDelete.products).delete();
         });
 
-        //test happy flow TODO: alle fields van product moeten terugkomen
+        //test happy flow
         it('should return 200 and all transactions', async()=>{
             const response = await request.get(url);
 
