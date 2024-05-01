@@ -67,20 +67,20 @@ const updateAllLeverancier = async (gebruikerId) => {
   const productenInStockData = await getKnex()(tables.bestelling)
     .select(`${tables.bestelling}.ORDERID`)
     .join(
-        tables.bestelling_besteldproduct,
+        tables.bestelling_besteldProduct,
         `${tables.bestelling}.ORDERID`,
         "=",
-        `${tables.bestelling_besteldproduct}.Bestelling_ORDERID`
+        `${tables.bestelling_besteldProduct}.Bestelling_ORDERID`
     )
     .join(
-        tables.besteldproduct,
-        `${tables.bestelling_besteldproduct}.producten_BESTELDPRODUCTID`,
+        tables.besteldProduct,
+        `${tables.bestelling_besteldProduct}.producten_BESTELDPRODUCTID`,
         "=",
-        `${tables.besteldproduct}.BESTELDPRODUCTID`
+        `${tables.besteldProduct}.BESTELDPRODUCTID`
     )
     .join(
         tables.product,
-        `${tables.besteldproduct}.PRODUCT_PRODUCTID`,
+        `${tables.besteldProduct}.PRODUCT_PRODUCTID`,
         "=",
         `${tables.product}.PRODUCTID`
     )
@@ -90,8 +90,8 @@ const updateAllLeverancier = async (gebruikerId) => {
     .andWhere(getKnex().raw(`
         NOT EXISTS (
             SELECT 1
-            FROM ${tables.bestelling_besteldproduct} AS bbp
-            JOIN ${tables.besteldproduct} AS bp ON bbp.producten_BESTELDPRODUCTID = bp.BESTELDPRODUCTID
+            FROM ${tables.bestelling_besteldProduct} AS bbp
+            JOIN ${tables.besteldProduct} AS bp ON bbp.producten_BESTELDPRODUCTID = bp.BESTELDPRODUCTID
             JOIN ${tables.product} AS p ON bp.PRODUCT_PRODUCTID = p.PRODUCTID
             WHERE ${tables.bestelling}.ORDERID = bbp.Bestelling_ORDERID
             AND p.STOCK <= bp.AANTAL
