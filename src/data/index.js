@@ -117,6 +117,8 @@ const tables = Object.freeze({
   bedrijf: "BEDRIJF",
   betaling: "BETALING",
   notificatie: "NOTIFICATIE",
+  besteldproduct: "BESTELDPRODUCT",
+  bestelling_besteldproduct: "BESTELLING_BESTELDPRODUCT",
 });
 
 module.exports = {
