@@ -11,18 +11,16 @@ const getAll = async (gebruikerId) => {
 
 const getById = async (id, gebruikerId) => {
   const bestelling = await bestellingRepository.getById(id, gebruikerId);
-
   if (
     !bestelling ||
-    (bestelling.KLANT_GEBRUIKERID !== gebruikerId &&
-      bestelling.LEVERANCIER_GEBRUIKERID !== gebruikerId)
+    (bestelling.klant.KLANT_GEBRUIKERID !== gebruikerId &&
+      bestelling.leverancier.LEVERANCIER_GEBRUIKERID !== gebruikerId)
   ) {
     throw ServiceError.notFound(
       `Geen bestelling met id ${id} voor klant/leverancier ${gebruikerId}`,
       { id, gebruikerId }
     );
   }
-
   return bestelling;
 };
 

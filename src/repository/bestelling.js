@@ -104,91 +104,7 @@ const formatBestelling = ({
 });
 
 const getAll = async (gebruikerId) => {
-  const /*bestellingen*/ bestellingenRows = await getKnex()(tables.bestelling)
-      .join(
-        tables.klant,
-        `${tables.bestelling}.KLANT_GEBRUIKERID`,
-        "=",
-        `${tables.klant}.GEBRUIKERID`
-      )
-      .join(
-        { u1: tables.gebruiker },
-        `${tables.klant}.GEBRUIKERID`,
-        "=",
-        `u1.GEBRUIKERID`
-      )
-      .join(
-        tables.leverancier,
-        `${tables.bestelling}.LEVERANCIER_GEBRUIKERID`,
-        "=",
-        `${tables.leverancier}.GEBRUIKERID`
-      )
-      .join(
-        { u2: tables.gebruiker },
-        `${tables.leverancier}.GEBRUIKERID`,
-        "=",
-        `u2.GEBRUIKERID`
-      )
-      .join(
-        { b1: tables.bedrijf },
-        `u1.GEBRUIKERID`,
-        "=",
-        `b1.KLANT_GEBRUIKERID`
-      )
-      .join(
-        { b2: tables.bedrijf },
-        `u2.GEBRUIKERID`,
-        "=",
-        `b2.LEVERANCIER_GEBRUIKERID`
-      )
-      .join(
-        tables.bestelling_besteldProduct,
-        `${tables.bestelling}.ORDERID`,
-        "=",
-        `${tables.bestelling_besteldProduct}.Bestelling_ORDERID`
-      )
-      .join(
-        tables.besteldProduct,
-        `${tables.bestelling_besteldProduct}.producten_BESTELDPRODUCTID`,
-        "=",
-        `${tables.besteldProduct}.BESTELDPRODUCTID`
-      )
-      .join(
-        tables.product,
-        `${tables.besteldProduct}.PRODUCT_PRODUCTID`,
-        "=",
-        `${tables.product}.PRODUCTID`
-      )
-      .where(`${tables.bestelling}.KLANT_GEBRUIKERID`, gebruikerId)
-      .orWhere(`${tables.bestelling}.LEVERANCIER_GEBRUIKERID`, gebruikerId)
-      .select(SELECT_COLUMS)
-      .orderBy(`${tables.bestelling}.ORDERID`, "DESC");
-
-  const bestellingenMap = bestellingenRows.reduce((map, row) => {
-    const orderId = row.ORDERID;
-    if (!map.has(orderId)) {
-      map.set(orderId, {
-        ...row,
-        PRODUCTEN: [],
-      });
-    }
-    map.get(orderId).PRODUCTEN.push({
-      PRODUCT_NAAM: row.PRODUCT_NAAM,
-      PRODUCT_EENHEIDSPRIJS: row.PRODUCT_EENHEIDSPRIJS,
-      PRODUCT_STOCK: row.PRODUCT_STOCK,
-      PRODUCT_AANTAL: row.PRODUCT_AANTAL,
-    });
-    return map;
-  }, new Map());
-
-  const bestellingen = Array.from(bestellingenMap.values()).map(
-    formatBestelling
-  );
-  return bestellingen;
-};
-
-const getById = async (id, gebruikerId) => {
-  const bestelling = await getKnex()(tables.bestelling)
+  const bestellingenRows = await getKnex()(tables.bestelling)
     .join(
       tables.klant,
       `${tables.bestelling}.KLANT_GEBRUIKERID`,
@@ -213,13 +129,134 @@ const getById = async (id, gebruikerId) => {
       "=",
       `u2.GEBRUIKERID`
     )
-    .where("KLANT_GEBRUIKERID", gebruikerId)
-    .andWhere("ORDERID", id)
-    .orWhere("LEVERANCIER_GEBRUIKERID", gebruikerId)
-    .andWhere("ORDERID", id)
-    .first(SELECT_COLUMS);
+    .join({ b1: tables.bedrijf }, `u1.GEBRUIKERID`, "=", `b1.KLANT_GEBRUIKERID`)
+    .join(
+      { b2: tables.bedrijf },
+      `u2.GEBRUIKERID`,
+      "=",
+      `b2.LEVERANCIER_GEBRUIKERID`
+    )
+    .join(
+      tables.bestelling_besteldProduct,
+      `${tables.bestelling}.ORDERID`,
+      "=",
+      `${tables.bestelling_besteldProduct}.Bestelling_ORDERID`
+    )
+    .join(
+      tables.besteldProduct,
+      `${tables.bestelling_besteldProduct}.producten_BESTELDPRODUCTID`,
+      "=",
+      `${tables.besteldProduct}.BESTELDPRODUCTID`
+    )
+    .join(
+      tables.product,
+      `${tables.besteldProduct}.PRODUCT_PRODUCTID`,
+      "=",
+      `${tables.product}.PRODUCTID`
+    )
+    .where(`${tables.bestelling}.KLANT_GEBRUIKERID`, gebruikerId)
+    .orWhere(`${tables.bestelling}.LEVERANCIER_GEBRUIKERID`, gebruikerId)
+    .select(SELECT_COLUMS)
+    .orderBy(`${tables.bestelling}.ORDERID`, "DESC");
 
-  return bestelling;
+  const bestellingenMap = bestellingenRows.reduce((map, row) => {
+    const orderId = row.ORDERID;
+    if (!map.has(orderId)) {
+      map.set(orderId, {
+        ...row,
+        PRODUCTEN: [],
+      });
+    }
+    map.get(orderId).PRODUCTEN.push({
+      PRODUCT_NAAM: row.PRODUCT_NAAM,
+      PRODUCT_EENHEIDSPRIJS: row.PRODUCT_EENHEIDSPRIJS,
+      PRODUCT_STOCK: row.PRODUCT_STOCK,
+      PRODUCT_AANTAL: row.PRODUCT_AANTAL,
+    });
+    return map;
+  }, new Map());
+
+  const bestellingen = Array.from(bestellingenMap.values()).map(
+    formatBestelling
+  );
+
+  return bestellingen;
+};
+
+const getById = async (id, gebruikerId) => {
+  const bestellingenRows = await getKnex()(tables.bestelling)
+    .join(
+      tables.klant,
+      `${tables.bestelling}.KLANT_GEBRUIKERID`,
+      "=",
+      `${tables.klant}.GEBRUIKERID`
+    )
+    .join(
+      { u1: tables.gebruiker },
+      `${tables.klant}.GEBRUIKERID`,
+      "=",
+      `u1.GEBRUIKERID`
+    )
+    .join(
+      tables.leverancier,
+      `${tables.bestelling}.LEVERANCIER_GEBRUIKERID`,
+      "=",
+      `${tables.leverancier}.GEBRUIKERID`
+    )
+    .join(
+      { u2: tables.gebruiker },
+      `${tables.leverancier}.GEBRUIKERID`,
+      "=",
+      `u2.GEBRUIKERID`
+    )
+    .join({ b1: tables.bedrijf }, `u1.GEBRUIKERID`, "=", `b1.KLANT_GEBRUIKERID`)
+    .join(
+      { b2: tables.bedrijf },
+      `u2.GEBRUIKERID`,
+      "=",
+      `b2.LEVERANCIER_GEBRUIKERID`
+    )
+    .join(
+      tables.bestelling_besteldProduct,
+      `${tables.bestelling}.ORDERID`,
+      "=",
+      `${tables.bestelling_besteldProduct}.Bestelling_ORDERID`
+    )
+    .join(
+      tables.besteldProduct,
+      `${tables.bestelling_besteldProduct}.producten_BESTELDPRODUCTID`,
+      "=",
+      `${tables.besteldProduct}.BESTELDPRODUCTID`
+    )
+    .join(
+      tables.product,
+      `${tables.besteldProduct}.PRODUCT_PRODUCTID`,
+      "=",
+      `${tables.product}.PRODUCTID`
+    )
+    .where(`${tables.bestelling}.KLANT_GEBRUIKERID`, gebruikerId)
+    .orWhere(`${tables.bestelling}.LEVERANCIER_GEBRUIKERID`, gebruikerId)
+    .having(`${tables.bestelling}.ORDERID`, "=", id)
+    .select(SELECT_COLUMS)
+    .orderBy(`${tables.bestelling}.ORDERID`, "DESC");
+
+  const bestelling = bestellingenRows.reduce((acc, row) => {
+    if (!acc) {
+      acc = {
+        ...row,
+        PRODUCTEN: [],
+      };
+    }
+    acc.PRODUCTEN.push({
+      PRODUCT_NAAM: row.PRODUCT_NAAM,
+      PRODUCT_EENHEIDSPRIJS: row.PRODUCT_EENHEIDSPRIJS,
+      PRODUCT_STOCK: row.PRODUCT_STOCK,
+      PRODUCT_AANTAL: row.PRODUCT_AANTAL,
+    });
+    return acc;
+  }, null);
+
+  return formatBestelling(bestelling);
 };
 
 const create = async ({
