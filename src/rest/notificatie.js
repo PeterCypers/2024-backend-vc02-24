@@ -6,21 +6,26 @@ const validate = require("../core/validation");
 
 const getAll = async (ctx) => {
   const { gebruikerId } = ctx.state.session;
-  ctx.body = await notificatieService.getAll(gebruikerId);
+  const limit = ctx.query.limit;
+  ctx.body = await notificatieService.getAll(gebruikerId, limit);
 };
-getAll.validationScheme = null
+getAll.validationScheme = {
+  query: Joi.object({
+    limit: Joi.number().positive().integer().max(1000).optional()
+  }),
+};
 
 const updateAll = async (ctx) => {
   const { gebruikerId, rol } = ctx.state.session;
   const body = await notificatieService.updateAll(gebruikerId, rol);
   ctx.body = body;
-}
+};
 updateAll.validationScheme = null
 
 const updateById = async (ctx) => {
   await notificatieService.updateById(ctx.params.id, ctx.request.body);
   ctx.status = 204;
-}
+};
 updateById.validationScheme = {
   params: {
     id: Joi.string().max(255),
@@ -32,14 +37,14 @@ updateById.validationScheme = {
     notificatieStatus: Joi.number().valid("nieuw", "ongelezen", "gelezen"),
     bericht: Joi.string().max(255),
   },
-}
+};
 
 module.exports = (app) => {
   const router = new Router({
     prefix: "/notificaties",
   });
 
-  router.get("/", requireAuthentication, getAll);
+  router.get("/", requireAuthentication, validate(getAll.validationScheme), getAll);
   router.post("/", requireAuthentication, updateAll);
   router.put("/:id", requireAuthentication, validate(updateById.validationScheme), updateById);
 

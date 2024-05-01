@@ -2,11 +2,12 @@ const genereerUniekeId = require('../core/hashing');
 const { getLogger } = require('../core/logging');
 const { getKnex, tables } = require('../data');
 
-const getAll = async (gebruikerId) => {
+const getAll = async (gebruikerId, limit) => {
   const notificaties = await getKnex()(tables.notificatie)
     .select()
     .where(`${tables.notificatie}.GEBRUIKERID`, gebruikerId)
-    .orderBy(`${tables.notificatie}.DATUM`, "DESC");
+    .orderBy(`${tables.notificatie}.DATUM`, "DESC")
+    .limit(limit ? limit : 1000);
 
   return notificaties;
 };

@@ -3,11 +3,12 @@ const ServiceError = require("../core/serviceError");
 const Role = require('../core/roles');
 const handleDBError = require("./_handleDBError");
 
-const getAll = async (gebruikerId) => {
-  const items = await notificatieRepository.getAll(gebruikerId);
+const getAll = async (gebruikerId, limit) => {
+  const items = await notificatieRepository.getAll(gebruikerId, limit);
   return {
     count: items.length,
     items,
+    limit,
   };
 };
 
