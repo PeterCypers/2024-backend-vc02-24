@@ -5,6 +5,8 @@ const knex = require("knex");
 
 const { getLogger } = require("../core/logging");
 
+const moment = require('moment');
+
 const NODE_ENV = config.get("env");
 const isDevelopment = NODE_ENV === "development";
 
@@ -32,6 +34,13 @@ async function initializeData() {
       user: DATABASE_USERNAME,
       password: DATABASE_PASSWORD,
       insecureAuth: isDevelopment,
+      // typeCast uit moment package om de DATE uit de db om te vormen naar een juist formaat zonder tijd
+      typeCast: function (field, next) {
+        if (field.type == 'DATE') {
+          return moment(field.string()).format('YYYY-MM-DD');
+        }
+        return next();
+      }
     },
     debug: isDevelopment,
     migrations: {
