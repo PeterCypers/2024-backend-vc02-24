@@ -1,4 +1,6 @@
 const Router = require("@koa/router");
+const Joi = require('joi');
+const validate = require('../core/validation');
 const bestellingService = require("../service/bestelling");
 const { requireAuthentication } = require("../core/auth");
 
@@ -10,9 +12,14 @@ const getAll = async (ctx) => {
 const getById = async (ctx) => {
   const { gebruikerId } = ctx.state.session;
   ctx.body = await bestellingService.getById(
-    Number(ctx.params.id),
-    Number(gebruikerId)
+    ctx.params.id,
+    gebruikerId
   );
+};
+getById.validationScheme = {
+  params: {
+    id: Joi.number().integer().positive(),
+  },
 };
 
 const create = async (ctx) => {
@@ -21,13 +28,18 @@ const create = async (ctx) => {
 };
 
 const updateById = async (ctx) => {
-  ctx.body = await bestellingService.updateById(Number(ctx.params.id), {
+  ctx.body = await bestellingService.updateById(ctx.params.id, {
     ...ctx.request.body,
   });
 };
 
 const deleteById = async (ctx) => {
-  await bestellingService.deleteById(Number(ctx.params.id));
+  await bestellingService.deleteById(ctx.params.id);
+};
+deleteById.validationScheme = {
+  params: {
+    id: Joi.number().integer().positive(),
+  },
 };
 
 module.exports = (app) => {
@@ -37,9 +49,9 @@ module.exports = (app) => {
 
   router.get("/", requireAuthentication, getAll);
   router.post("/", requireAuthentication, create);
-  router.get("/:id", requireAuthentication, getById);
+  router.get("/:id", requireAuthentication, validate(getById.validationScheme), getById);
   router.put("/:id", requireAuthentication, updateById);
-  router.delete("/:id", requireAuthentication, deleteById);
+  router.delete("/:id", requireAuthentication, validate(deleteById.validationScheme), deleteById);
 
   app.use(router.routes()).use(router.allowedMethods());
 };
