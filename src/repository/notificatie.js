@@ -1,4 +1,5 @@
 const genereerUniekeId = require('../core/hashing');
+const { getLogger } = require('../core/logging');
 const { getKnex, tables } = require('../data');
 
 const getAll = async (gebruikerId) => {
@@ -121,8 +122,30 @@ const updateAllLeverancier = async (gebruikerId) => {
   return notificaties.length;
 }
 
+const updateById = async (id, { gebruikerId, orderId, datum, notificatieStatus, bericht }) => {
+  try {
+    const result = await getKnex()(tables.notificatie)
+      .update({
+        GEBRUIKERID: gebruikerId,
+        ORDERID: orderId,
+        DATUM: datum,
+        NOTIFICATIESTATUS: notificatieStatus,
+        BERICHT: bericht,
+      })
+      .where('NOTIFICATIEID', id);
+      
+    return result;
+  } catch (error) {
+    getLogger().error('Error in updateById', {
+      error,
+    });
+    throw error;
+  }
+}
+
 module.exports = {
   getAll,
   updateAllKlant,
   updateAllLeverancier,
+  updateById,
 };
