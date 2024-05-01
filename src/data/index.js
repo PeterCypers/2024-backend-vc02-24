@@ -8,12 +8,14 @@ const { getLogger } = require("../core/logging");
 const NODE_ENV = config.get("env");
 const isDevelopment = NODE_ENV === "development";
 
-const DATABASE_CLIENT = config.get('database.client');
-const DATABASE_NAME = config.get('database.name');
-const DATABASE_HOST = config.get('database.host');
-const DATABASE_PORT = config.get('database.port');
-const DATABASE_USERNAME = config.get('database.username');
-const DATABASE_PASSWORD = config.has('database.password') ? config.get('database.password') : '';
+const DATABASE_CLIENT = config.get("database.client");
+const DATABASE_NAME = config.get("database.name");
+const DATABASE_HOST = config.get("database.host");
+const DATABASE_PORT = config.get("database.port");
+const DATABASE_USERNAME = config.get("database.username");
+const DATABASE_PASSWORD = config.has("database.password")
+  ? config.get("database.password")
+  : "";
 
 let knexInstance;
 
@@ -33,11 +35,11 @@ async function initializeData() {
     },
     debug: isDevelopment,
     migrations: {
-      tableName: 'knex_meta',
-      directory: join('src', 'data', 'migrations'),
+      tableName: "knex_meta",
+      directory: join("src", "data", "migrations"),
     },
     seeds: {
-      directory: join('src', 'data', 'seeds'),
+      directory: join("src", "data", "seeds"),
     },
   };
 
@@ -61,16 +63,16 @@ async function initializeData() {
   }
 
   // Run migrations (enkel in test-omgeving)
-  if(NODE_ENV === 'test'){
+  if (NODE_ENV === "test") {
     try {
       await knexInstance.migrate.latest();
     } catch (error) {
-      logger.error('Error while migrating the database', {
+      logger.error("Error while migrating the database", {
         error,
       });
 
       // No point in starting the server when migrations failed
-      throw new Error('Migrations failed, check the logs');
+      throw new Error("Migrations failed, check the logs");
     }
   }
 
@@ -115,6 +117,8 @@ const tables = Object.freeze({
   klant: "KLANT",
   leverancier: "LEVERANCIER",
   bedrijf: "BEDRIJF",
+  besteldProduct: "BESTELDPRODUCT",
+  bestelling_besteldProduct: "BESTELLING_BESTELDPRODUCT",
 });
 
 module.exports = {

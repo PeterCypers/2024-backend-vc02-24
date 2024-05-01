@@ -32,6 +32,11 @@ const SELECT_COLUMS = [
   `b2.LOGO as LEVERANCIER_BEDRIJF_LOGO`,
   `b2.REKENINGNUMMER as LEVERANCIER_BEDRIJF_REKENINGNUMMER`,
   `b2.SECTOR as LEVERANCIER_BEDRIJF_SECTOR`,
+
+  `${tables.product}.NAAM as PRODUCT_NAAM`,
+  `${tables.product}.EENHEIDSPRIJS as PRODUCT_EENHEIDSPRIJS`,
+  `${tables.product}.STOCK as PRODUCT_STOCK`,
+  `${tables.besteldProduct}.AANTAL as PRODUCT_AANTAL`,
 ];
 
 const formatBestelling = ({
@@ -58,39 +63,48 @@ const formatBestelling = ({
   LEVERANCIER_BEDRIJF_LOGO,
   LEVERANCIER_BEDRIJF_REKENINGNUMMER,
   LEVERANCIER_BEDRIJF_SECTOR,
+
+  PRODUCTEN,
+
   ...rest
 }) => ({
   ...rest,
   klant: {
-    KLANT_GEBRUIKERID: KLANT_GEBRUIKERID,
+    KLANT_GEBRUIKERID,
     TELEFOONNUMMER: KLANT_TELEFOONNUMMER,
-    KLANT_EMAILADRES: KLANT_EMAILADRES,
+    KLANT_EMAILADRES,
     LAND: KLANT_LAND,
     POSTCODE: KLANT_POSTCODE,
     STAD: KLANT_STAD,
     STRAAT: KLANT_STRAAT,
     STRAATNR: KLANT_STRAATNR,
-    KLANT_BEDRIJF_NAAM: KLANT_BEDRIJF_NAAM,
-    KLANT_BEDRIJF_BTWNR: KLANT_BEDRIJF_BTWNR,
-    KLANT_BEDRIJF_ISACTIEF: KLANT_BEDRIJF_ISACTIEF,
-    KLANT_BEDRIJF_LOGO: KLANT_BEDRIJF_LOGO,
-    KLANT_BEDRIJF_REKENINGNUMMER: KLANT_BEDRIJF_REKENINGNUMMER,
-    KLANT_BEDRIJF_SECTOR: KLANT_BEDRIJF_SECTOR,
+    KLANT_BEDRIJF_NAAM,
+    KLANT_BEDRIJF_BTWNR,
+    KLANT_BEDRIJF_ISACTIEF,
+    KLANT_BEDRIJF_LOGO,
+    KLANT_BEDRIJF_REKENINGNUMMER,
+    KLANT_BEDRIJF_SECTOR,
   },
   leverancier: {
-    LEVERANCIER_GEBRUIKERID: LEVERANCIER_GEBRUIKERID,
-    LEVERANCIER_EMAILADRES: LEVERANCIER_EMAILADRES,
-    LEVERANCIER_BEDRIJF_NAAM: LEVERANCIER_BEDRIJF_NAAM,
-    LEVERANCIER_BEDRIJF_BTWNR: LEVERANCIER_BEDRIJF_BTWNR,
-    LEVERANCIER_BEDRIJF_ISACTIEF: LEVERANCIER_BEDRIJF_ISACTIEF,
-    LEVERANCIER_BEDRIJF_LOGO: LEVERANCIER_BEDRIJF_LOGO,
-    LEVERANCIER_BEDRIJF_REKENINGNUMMER: LEVERANCIER_BEDRIJF_REKENINGNUMMER,
-    LEVERANCIER_BEDRIJF_SECTOR: LEVERANCIER_BEDRIJF_SECTOR,
+    LEVERANCIER_GEBRUIKERID,
+    LEVERANCIER_EMAILADRES,
+    LEVERANCIER_BEDRIJF_NAAM,
+    LEVERANCIER_BEDRIJF_BTWNR,
+    LEVERANCIER_BEDRIJF_ISACTIEF,
+    LEVERANCIER_BEDRIJF_LOGO,
+    LEVERANCIER_BEDRIJF_REKENINGNUMMER,
+    LEVERANCIER_BEDRIJF_SECTOR,
   },
+  producten: PRODUCTEN.map((product) => ({
+    PRODUCT_NAAM: product.PRODUCT_NAAM,
+    PRODUCT_EENHEIDSPRIJS: product.PRODUCT_EENHEIDSPRIJS,
+    PRODUCT_STOCK: product.PRODUCT_STOCK,
+    PRODUCT_AANTAL: product.PRODUCT_AANTAL,
+  })),
 });
 
 const getAll = async (gebruikerId) => {
-  const bestellingen = await getKnex()(tables.bestelling)
+  const bestellingenRows = await getKnex()(tables.bestelling)
     .join(
       tables.klant,
       `${tables.bestelling}.KLANT_GEBRUIKERID`,
@@ -122,16 +136,55 @@ const getAll = async (gebruikerId) => {
       "=",
       `b2.LEVERANCIER_GEBRUIKERID`
     )
+    .join(
+      tables.bestelling_besteldProduct,
+      `${tables.bestelling}.ORDERID`,
+      "=",
+      `${tables.bestelling_besteldProduct}.Bestelling_ORDERID`
+    )
+    .join(
+      tables.besteldProduct,
+      `${tables.bestelling_besteldProduct}.producten_BESTELDPRODUCTID`,
+      "=",
+      `${tables.besteldProduct}.BESTELDPRODUCTID`
+    )
+    .join(
+      tables.product,
+      `${tables.besteldProduct}.PRODUCT_PRODUCTID`,
+      "=",
+      `${tables.product}.PRODUCTID`
+    )
     .where(`${tables.bestelling}.KLANT_GEBRUIKERID`, gebruikerId)
     .orWhere(`${tables.bestelling}.LEVERANCIER_GEBRUIKERID`, gebruikerId)
     .select(SELECT_COLUMS)
     .orderBy(`${tables.bestelling}.ORDERID`, "DESC");
 
-  return bestellingen.map(formatBestelling);
+  const bestellingenMap = bestellingenRows.reduce((map, row) => {
+    const orderId = row.ORDERID;
+    if (!map.has(orderId)) {
+      map.set(orderId, {
+        ...row,
+        PRODUCTEN: [],
+      });
+    }
+    map.get(orderId).PRODUCTEN.push({
+      PRODUCT_NAAM: row.PRODUCT_NAAM,
+      PRODUCT_EENHEIDSPRIJS: row.PRODUCT_EENHEIDSPRIJS,
+      PRODUCT_STOCK: row.PRODUCT_STOCK,
+      PRODUCT_AANTAL: row.PRODUCT_AANTAL,
+    });
+    return map;
+  }, new Map());
+
+  const bestellingen = Array.from(bestellingenMap.values()).map(
+    formatBestelling
+  );
+
+  return bestellingen;
 };
 
 const getById = async (id, gebruikerId) => {
-  const bestelling = await getKnex()(tables.bestelling)
+  const bestellingenRows = await getKnex()(tables.bestelling)
     .join(
       tables.klant,
       `${tables.bestelling}.KLANT_GEBRUIKERID`,
@@ -156,13 +209,54 @@ const getById = async (id, gebruikerId) => {
       "=",
       `u2.GEBRUIKERID`
     )
-    .where("KLANT_GEBRUIKERID", gebruikerId)
-    .andWhere("ORDERID", id)
-    .orWhere("LEVERANCIER_GEBRUIKERID", gebruikerId)
-    .andWhere("ORDERID", id)
-    .first(SELECT_COLUMS);
+    .join({ b1: tables.bedrijf }, `u1.GEBRUIKERID`, "=", `b1.KLANT_GEBRUIKERID`)
+    .join(
+      { b2: tables.bedrijf },
+      `u2.GEBRUIKERID`,
+      "=",
+      `b2.LEVERANCIER_GEBRUIKERID`
+    )
+    .join(
+      tables.bestelling_besteldProduct,
+      `${tables.bestelling}.ORDERID`,
+      "=",
+      `${tables.bestelling_besteldProduct}.Bestelling_ORDERID`
+    )
+    .join(
+      tables.besteldProduct,
+      `${tables.bestelling_besteldProduct}.producten_BESTELDPRODUCTID`,
+      "=",
+      `${tables.besteldProduct}.BESTELDPRODUCTID`
+    )
+    .join(
+      tables.product,
+      `${tables.besteldProduct}.PRODUCT_PRODUCTID`,
+      "=",
+      `${tables.product}.PRODUCTID`
+    )
+    .where(`${tables.bestelling}.KLANT_GEBRUIKERID`, gebruikerId)
+    .orWhere(`${tables.bestelling}.LEVERANCIER_GEBRUIKERID`, gebruikerId)
+    .having(`${tables.bestelling}.ORDERID`, "=", id)
+    .select(SELECT_COLUMS)
+    .orderBy(`${tables.bestelling}.ORDERID`, "DESC");
 
-  return bestelling;
+  const bestelling = bestellingenRows.reduce((acc, row) => {
+    if (!acc) {
+      acc = {
+        ...row,
+        PRODUCTEN: [],
+      };
+    }
+    acc.PRODUCTEN.push({
+      PRODUCT_NAAM: row.PRODUCT_NAAM,
+      PRODUCT_EENHEIDSPRIJS: row.PRODUCT_EENHEIDSPRIJS,
+      PRODUCT_STOCK: row.PRODUCT_STOCK,
+      PRODUCT_AANTAL: row.PRODUCT_AANTAL,
+    });
+    return acc;
+  }, null);
+
+  return formatBestelling(bestelling);
 };
 
 const create = async ({
