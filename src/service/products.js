@@ -1,12 +1,16 @@
 const productRepository = require("../repository/products");
 const ServiceError = require('../core/serviceError');
 
-const getAllProducts = async () => {
-  const products = await productRepository.findAll();
+const getAllProducts = async (limit, offset, filter, order) => {
+  const products = await productRepository.findAll(limit, offset, filter, order);
   const totalCount = products.length;
   return {
     data: products,
     count: totalCount,
+    limit,
+    offset,
+    filter,
+    order,
   };
 };
 

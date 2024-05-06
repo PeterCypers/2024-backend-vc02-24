@@ -34,7 +34,7 @@ updateById.validationScheme = {
     gebruikerId: Joi.number().integer().positive(),
     orderId: Joi.number().integer().positive(),
     datum: Joi.date(),
-    notificatieStatus: Joi.number().valid("nieuw", "ongelezen", "gelezen"),
+    notificatieStatus: Joi.string().valid("nieuw", "ongelezen", "gelezen"),
     bericht: Joi.string().max(255),
   },
 };
