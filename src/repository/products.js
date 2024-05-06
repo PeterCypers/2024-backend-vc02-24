@@ -3,16 +3,19 @@ const { tables, getKnex } = require("../data/index");
 const findAll = (limit, offset, filter, order) => {
   return getKnex()(tables.product)
     .select("*")
-    .limit(limit ? limit : 100)
-    .offset(offset ? offset : 0)
     .modify(function(queryBuilder) {
       if (filter) {
         queryBuilder.whereILike('NAAM', `%${filter}%`);
       }
       if (order) {
-        queryBuilder.orderBy('EENHEIDSPRIJS', order);
+        queryBuilder.orderBy([
+          { column: 'EENHEIDSPRIJS', order },
+          { column: 'PRODUCTID', order: 'asc' }, // zonder extra te sorteren op id, krijgen we inconsistente paginatie in geval van offsetting met gelijke prijzen
+        ]);
       }
     })
+    .offset(offset ? offset : 0)
+    .limit(limit ? limit : 100);
 };
 
 const findById = (id) => {

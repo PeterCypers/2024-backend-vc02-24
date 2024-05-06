@@ -13,9 +13,9 @@ const getAllProducts = async (ctx) => {
 getAllProducts.validationScheme = {
   query: Joi.object({
     filter: Joi.string().optional(), 
-    order: Joi.string().optional().valid("asc", "desc"),
-    limit: Joi.number().optional().positive().integer().max(100),
-    offset: Joi.number().optional().positive().integer(),
+    order: Joi.string().valid("asc", "desc").optional(),
+    limit: Joi.number().integer().positive().max(100).optional(),
+    offset: Joi.number().integer().min(0).optional(),
   }).and('limit', 'offset'),
 };
 
