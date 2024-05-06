@@ -6,7 +6,17 @@ const { requireAuthentication } = require("../core/auth");
 
 const getAll = async (ctx) => {
   const { gebruikerId } = ctx.state.session;
-  ctx.body = await bestellingService.getAll(gebruikerId);
+  const { limit, offset, filter, order, orderField } = ctx.query;
+  ctx.body = await bestellingService.getAll(gebruikerId, limit, offset, filter, order, orderField );
+};
+getAll.validationScheme = {
+  query: Joi.object({
+    filter: Joi.string().optional(), 
+    order: Joi.string().valid("asc", "desc").optional(),
+    orderField: Joi.string().optional().valid("DATUMGEPLAATST","BEDRIJF_NAAM","ORDERID","ORDERSTATUS","BETALINGSTATUS"),
+    limit: Joi.number().integer().positive().max(100).optional(),
+    offset: Joi.number().integer().min(0).optional(),
+  }).and('limit', 'offset').and('order', 'orderField'),
 };
 
 const getById = async (ctx) => {
@@ -47,7 +57,7 @@ module.exports = (app) => {
     prefix: "/bestellingen",
   });
 
-  router.get("/", requireAuthentication, getAll);
+  router.get("/", requireAuthentication, validate(getAll.validationScheme), getAll);
   router.post("/", requireAuthentication, create);
   router.get("/:id", requireAuthentication, validate(getById.validationScheme), getById);
   router.put("/:id", requireAuthentication, updateById);

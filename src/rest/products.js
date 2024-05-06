@@ -5,10 +5,8 @@ const Router = require("@koa/router");
 
 const getAllProducts = async (ctx) => {
   const { limit, offset, filter, order } = ctx.query;
-  
   const result = await productService.getAllProducts(limit, offset, filter, order);
   ctx.body = result;
-  console.log(ctx);
 };
 getAllProducts.validationScheme = {
   query: Joi.object({

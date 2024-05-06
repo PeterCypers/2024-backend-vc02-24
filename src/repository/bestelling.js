@@ -103,7 +103,7 @@ const formatBestelling = ({
   })),
 });
 
-const getAll = async (gebruikerId) => {
+const getAll = async (gebruikerId, limit, offset, filter, order, orderField) => {
   const bestellingenRows = await getKnex()(tables.bestelling)
     .join(
       tables.klant,
@@ -154,10 +154,31 @@ const getAll = async (gebruikerId) => {
       "=",
       `${tables.product}.PRODUCTID`
     )
-    .where(`${tables.bestelling}.KLANT_GEBRUIKERID`, gebruikerId)
-    .orWhere(`${tables.bestelling}.LEVERANCIER_GEBRUIKERID`, gebruikerId)
     .select(SELECT_COLUMS)
-    .orderBy(`${tables.bestelling}.ORDERID`, "DESC");
+    .where((queryBuilder) => {
+      queryBuilder.where(`${tables.bestelling}.KLANT_GEBRUIKERID`, gebruikerId)
+        .orWhere(`${tables.bestelling}.LEVERANCIER_GEBRUIKERID`, gebruikerId);
+    })
+    .andWhere((queryBuilder) => {
+      if (!filter)
+        return true;
+
+      queryBuilder.whereILike(`${tables.bestelling}.DATUMGEPLAATST`, `%${filter}%`)
+        .orWhereILike(`${tables.klant}.BEDRIJF_NAAM`, `%${filter}%`)
+        .orWhereILike(`${tables.bestelling}.ORDERID`, `%${filter}%`)
+        .orWhereILike(`${tables.bestelling}.ORDERSTATUS`, `%${filter}%`)
+        .orWhereILike(`${tables.bestelling}.BETALINGSTATUS`, `%${filter}%`);
+    })
+    .modify(function(queryBuilder) {
+      if (!order) {
+        orderField = `ORDERID`;
+        order = `desc`;
+      }
+
+      const orderTable = orderField === "BEDRIJF_NAAM" ? tables.klant : tables.bestelling;
+
+      queryBuilder.orderBy(`${orderTable}.${orderField}`, order);
+    });
 
   const bestellingenMap = bestellingenRows.reduce((map, row) => {
     const orderId = row.ORDERID;
@@ -176,7 +197,7 @@ const getAll = async (gebruikerId) => {
     return map;
   }, new Map());
 
-  const bestellingen = Array.from(bestellingenMap.values()).map(
+  const bestellingen = Array.from(bestellingenMap.values()).slice(offset || 0, limit || 100).map(
     formatBestelling
   );
 
