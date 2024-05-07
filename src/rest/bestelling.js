@@ -5,9 +5,9 @@ const bestellingService = require("../service/bestelling");
 const { requireAuthentication } = require("../core/auth");
 
 const getAll = async (ctx) => {
-  const { gebruikerId } = ctx.state.session;
+  const { gebruikerId, rol } = ctx.state.session;
   const { limit, offset, filter, order, orderField } = ctx.query;
-  ctx.body = await bestellingService.getAll(gebruikerId, limit, offset, filter, order, orderField );
+  ctx.body = await bestellingService.getAll(gebruikerId, rol, limit, offset, filter, order, orderField );
 };
 getAll.validationScheme = {
   query: Joi.object({

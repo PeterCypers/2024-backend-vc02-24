@@ -1,5 +1,6 @@
 const { getLogger } = require("../core/logging");
 const { tables, getKnex } = require("../data");
+const Role = require('../core/roles');
 
 const SELECT_COLUMS = [
   `${tables.bestelling}.ORDERID`,
@@ -103,7 +104,7 @@ const formatBestelling = ({
   })),
 });
 
-const getAll = async (gebruikerId, limit, offset, filter, order, orderField) => {
+const getAll = async (gebruikerId, rol, limit, offset, filter, order, orderField) => {
   const bestellingenRows = await getKnex()(tables.bestelling)
     .join(
       tables.klant,
@@ -164,7 +165,7 @@ const getAll = async (gebruikerId, limit, offset, filter, order, orderField) => 
         return true;
 
       queryBuilder.whereILike(`${tables.bestelling}.DATUMGEPLAATST`, `%${filter}%`)
-        .orWhereILike(`${tables.klant}.BEDRIJF_NAAM`, `%${filter}%`)
+        .orWhereILike(`${rol == Role.LEVERANCIER ? tables.klant : tables.leverancier}.BEDRIJF_NAAM`, `%${filter}%`)
         .orWhereILike(`${tables.bestelling}.ORDERID`, `%${filter}%`)
         .orWhereILike(`${tables.bestelling}.ORDERSTATUS`, `%${filter}%`)
         .orWhereILike(`${tables.bestelling}.BETALINGSTATUS`, `%${filter}%`);
@@ -175,7 +176,12 @@ const getAll = async (gebruikerId, limit, offset, filter, order, orderField) => 
         order = `desc`;
       }
 
-      const orderTable = orderField === "BEDRIJF_NAAM" ? tables.klant : tables.bestelling;
+      let orderTable;
+      if (orderField === "BEDRIJF_NAAM") {
+        orderTable = rol == Role.LEVERANCIER ? tables.klant : tables.leverancier;
+      } else {
+        orderTable = tables.bestelling;
+      }
 
       queryBuilder.orderBy(`${orderTable}.${orderField}`, order);
     });

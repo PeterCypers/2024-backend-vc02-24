@@ -1,8 +1,8 @@
 const bestellingRepository = require("../repository/bestelling");
 const ServiceError = require("../core/serviceError");
 
-const getAll = async (gebruikerId, limit, offset, filter, order, orderField) => {
-  const items = await bestellingRepository.getAll(gebruikerId, limit, offset, filter, order, orderField);
+const getAll = async (gebruikerId, rol, limit, offset, filter, order, orderField) => {
+  const items = await bestellingRepository.getAll(gebruikerId, rol, limit, offset, filter, order, orderField);
   return {
     count: items.length,
     items,
