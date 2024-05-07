@@ -41,7 +41,8 @@ module.exports = function installProductRouter(app) {
   router.get(
     "/:id",
     validate(getProductById.validationScheme),
-    getProductById);
+    getProductById
+  );
 
   app.use(router.routes()).use(router.allowedMethods());
 };
