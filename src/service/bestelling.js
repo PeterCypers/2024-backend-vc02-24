@@ -1,14 +1,33 @@
 const bestellingRepository = require("../repository/bestelling");
 const ServiceError = require("../core/serviceError");
 
-const getAll = async (gebruikerId, rol, limit, offset, filter, order, orderField) => {
-  const items = await bestellingRepository.getAll(gebruikerId, rol, limit, offset, filter, order, orderField);
+const getAll = async (gebruikerId, rol, limit, offset, filterValues, filterFields, order, orderField) => {
+  if (filterValues) {
+    filterValues = filterValues.split(',');
+    filterFields = filterFields.split(',');
+  
+    if (filterValues.length != filterFields.length)
+      throw ServiceError.notFound(`Ongelijk aantal filtervelden en filterwaarden`);
+  }
+
+  const items = await bestellingRepository.getAll(
+    gebruikerId, 
+    rol, 
+    limit, 
+    offset, 
+    filterValues, 
+    filterFields, 
+    order, 
+    orderField
+  );
+
   return {
     count: items.length,
     items,
     limit,
     offset,
-    filter,
+    filterValues,
+    filterFields,
     order,
     orderField,
   };

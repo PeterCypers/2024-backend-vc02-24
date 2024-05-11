@@ -6,17 +6,38 @@ const { requireAuthentication } = require("../core/auth");
 
 const getAll = async (ctx) => {
   const { gebruikerId, rol } = ctx.state.session;
-  const { limit, offset, filter, order, orderField } = ctx.query;
-  ctx.body = await bestellingService.getAll(gebruikerId, rol, limit, offset, filter, order, orderField );
+  const { limit, offset, filterValues, filterFields, order, orderField } = ctx.query;
+  ctx.body = await bestellingService.getAll(gebruikerId, rol, limit, offset, filterValues, filterFields, order, orderField);
 };
+const itemSchema = Joi.string().valid("DATUMGEPLAATST", "BEDRIJF_NAAM", "ORDERID", "ORDERSTATUS", "BETALINGSTATUS");
+const commaSeparatedListSchema = Joi.string().pattern(/^[a-zA-Z0-9_]+(?:,[a-zA-Z0-9_]+)*$/);
 getAll.validationScheme = {
   query: Joi.object({
-    filter: Joi.string().optional(), 
+    filterValues: Joi.string().pattern(/^[a-zA-Z0-9_]+(?:,[a-zA-Z0-9_]+)*$/).optional(),
+    filterFields: Joi.string().custom((value, helpers) => {
+      if (value?.length <= 1) { // Check if value is undefined or empty
+        return '';
+      }
+
+      const commaSeparatedListResult = commaSeparatedListSchema.validate(value);
+      if (commaSeparatedListResult.error) {
+        return helpers.error('any.invalid');
+      }
+
+      const items = value.split(',');
+      for (const item of items) {
+        const validationResult = itemSchema.validate(item);
+        if (validationResult.error) {
+          return helpers.error('any.invalid');
+        }
+      }
+      return value;
+    }, 'Filterfields validatie').optional(),
     order: Joi.string().valid("asc", "desc").optional(),
-    orderField: Joi.string().optional().valid("DATUMGEPLAATST","BEDRIJF_NAAM","ORDERID","ORDERSTATUS","BETALINGSTATUS"),
+    orderField: Joi.string().optional().valid("DATUMGEPLAATST", "BEDRIJF_NAAM", "ORDERID", "ORDERSTATUS", "BETALINGSTATUS"),
     limit: Joi.number().integer().positive().max(100).optional(),
     offset: Joi.number().integer().min(0).optional(),
-  }).and('limit', 'offset').and('order', 'orderField'),
+  }).and('limit', 'offset').and('filterValues', 'filterFields').and('order', 'orderField'),
 };
 
 const getById = async (ctx) => {

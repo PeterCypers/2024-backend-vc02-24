@@ -104,7 +104,7 @@ const formatBestelling = ({
   })),
 });
 
-const getAll = async (gebruikerId, rol, limit, offset, filter, order, orderField) => {
+const getAll = async (gebruikerId, rol, limit, offset, filterValues, filterFields, order, orderField) => {
   const bestellingenRows = await getKnex()(tables.bestelling)
     .join(
       tables.klant,
@@ -161,16 +161,29 @@ const getAll = async (gebruikerId, rol, limit, offset, filter, order, orderField
         .orWhere(`${tables.bestelling}.LEVERANCIER_GEBRUIKERID`, gebruikerId);
     })
     .andWhere((queryBuilder) => {
-      if (!filter)
+      if (!filterFields?.length)
         return true;
 
-      queryBuilder.whereILike(`${tables.bestelling}.DATUMGEPLAATST`, `%${filter}%`)
-        .orWhereILike(`${rol == Role.LEVERANCIER ? tables.klant : tables.leverancier}.BEDRIJF_NAAM`, `%${filter}%`)
-        .orWhereILike(`${tables.bestelling}.ORDERID`, `%${filter}%`)
-        .orWhereILike(`${tables.bestelling}.ORDERSTATUS`, `%${filter}%`)
-        .orWhereILike(`${tables.bestelling}.BETALINGSTATUS`, `%${filter}%`);
+      filterFields.forEach((field, index) => {
+        const filter = filterValues[index];
+
+        console.log(`${field} | ${filter}`);
+
+        let tableField;
+        if (field === "BEDRIJF_NAAM") {
+          tableField = `${rol == Role.LEVERANCIER ? tables.klant : tables.leverancier}.${field}`;
+        } else {
+          tableField = `${tables.bestelling}.${field}`;
+        }
+
+        if (index === 0) {
+          queryBuilder.whereILike(tableField, `%${filter}%`);
+        } else {
+          queryBuilder.andWhereILike(tableField, `%${filter}%`);
+        }
+      });
     })
-    .modify(function(queryBuilder) {
+    .modify(function (queryBuilder) {
       if (!order) {
         orderField = `ORDERID`;
         order = `desc`;
