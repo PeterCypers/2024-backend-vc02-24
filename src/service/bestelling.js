@@ -10,7 +10,7 @@ const getAll = async (gebruikerId, rol, limit, offset, filterValues, filterField
       throw ServiceError.notFound(`Ongelijk aantal filtervelden en filterwaarden`);
   }
 
-  const items = await bestellingRepository.getAll(
+  const { count, items } = await bestellingRepository.getAll(
     gebruikerId, 
     rol, 
     limit, 
@@ -22,8 +22,9 @@ const getAll = async (gebruikerId, rol, limit, offset, filterValues, filterField
   );
 
   return {
-    count: items.length,
+    total: count,
     items,
+    count: items.length,
     limit,
     offset,
     filterValues,

@@ -105,6 +105,81 @@ const formatBestelling = ({
 });
 
 const getAll = async (gebruikerId, rol, limit, offset, filterValues, filterFields, order, orderField) => {
+  const totalCountQuery = await getKnex()(tables.bestelling)
+    .select(`${tables.bestelling}.ORDERID`)
+    .distinct()
+    .join(
+      tables.klant,
+      `${tables.bestelling}.KLANT_GEBRUIKERID`,
+      "=",
+      `${tables.klant}.GEBRUIKERID`
+    )
+    .join(
+      { u1: tables.gebruiker },
+      `${tables.klant}.GEBRUIKERID`,
+      "=",
+      `u1.GEBRUIKERID`
+    )
+    .join(
+      tables.leverancier,
+      `${tables.bestelling}.LEVERANCIER_GEBRUIKERID`,
+      "=",
+      `${tables.leverancier}.GEBRUIKERID`
+    )
+    .join(
+      { u2: tables.gebruiker },
+      `${tables.leverancier}.GEBRUIKERID`,
+      "=",
+      `u2.GEBRUIKERID`
+    )
+    .join({ b1: tables.bedrijf }, `u1.GEBRUIKERID`, "=", `b1.KLANT_GEBRUIKERID`)
+    .join(
+      { b2: tables.bedrijf },
+      `u2.GEBRUIKERID`,
+      "=",
+      `b2.LEVERANCIER_GEBRUIKERID`
+    )
+    .join(
+      tables.bestelling_besteldProduct,
+      `${tables.bestelling}.ORDERID`,
+      "=",
+      `${tables.bestelling_besteldProduct}.Bestelling_ORDERID`
+    )
+    .join(
+      tables.besteldProduct,
+      `${tables.bestelling_besteldProduct}.producten_BESTELDPRODUCTID`,
+      "=",
+      `${tables.besteldProduct}.BESTELDPRODUCTID`
+    )
+    .join(
+      tables.product,
+      `${tables.besteldProduct}.PRODUCT_PRODUCTID`,
+      "=",
+      `${tables.product}.PRODUCTID`
+    )
+    .where((queryBuilder) => {
+      queryBuilder.where(`${tables.bestelling}.KLANT_GEBRUIKERID`, gebruikerId)
+        .orWhere(`${tables.bestelling}.LEVERANCIER_GEBRUIKERID`, gebruikerId);
+      if (filterFields?.length) {
+        filterFields.forEach((field, index) => {
+          const filter = filterValues[index];
+          let tableField;
+          if (field === "BEDRIJF_NAAM") {
+            tableField = `${rol == Role.LEVERANCIER ? tables.klant : tables.leverancier}.${field}`;
+          } else {
+            tableField = `${tables.bestelling}.${field}`;
+          }
+          if (index === 0) {
+            queryBuilder.whereILike(tableField, `%${filter}%`);
+          } else {
+            queryBuilder.andWhereILike(tableField, `%${filter}%`);
+          }
+        });
+      }
+    });
+
+  const count = parseInt(totalCountQuery.length);
+
   const bestellingenRows = await getKnex()(tables.bestelling)
     .join(
       tables.klant,
@@ -216,11 +291,17 @@ const getAll = async (gebruikerId, rol, limit, offset, filterValues, filterField
     return map;
   }, new Map());
 
-  const bestellingen = Array.from(bestellingenMap.values()).slice(offset || 0, limit || 100).map(
+  const startIndex = offset ? offset : 0;
+  const eindIndex = limit ? Number(offset) + Number(limit) : 100;
+
+  const items = Array.from(bestellingenMap.values()).map(
     formatBestelling
+  ).slice(
+    startIndex,
+    eindIndex
   );
 
-  return bestellingen;
+  return { count, items };
 };
 
 const getById = async (id, gebruikerId) => {
