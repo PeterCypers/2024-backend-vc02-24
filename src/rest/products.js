@@ -4,16 +4,24 @@ const validate = require('../core/validation');
 const Router = require("@koa/router");
 
 const getAllProducts = async (ctx) => {
-  const { data, count } = await productService.getAllProducts();
-  ctx.body = { data, count };
+  const { limit, offset, filter, order } = ctx.query;
+  const result = await productService.getAllProducts(limit, offset, filter, order);
+  ctx.body = result;
 };
-getAllProducts.validationscheme = null;
+getAllProducts.validationScheme = {
+  query: Joi.object({
+    filter: Joi.string().optional(), 
+    order: Joi.string().valid("asc", "desc").optional(),
+    limit: Joi.number().integer().positive().max(100).optional(),
+    offset: Joi.number().integer().min(0).optional(),
+  }).and('limit', 'offset'),
+};
 
 const getProductById = async (ctx) => {
   const product = await productService.getProductById(ctx.params.id);
   ctx.body = product;
 };
-getProductById.validationscheme = {
+getProductById.validationScheme = {
   params: {
     id: Joi.number().integer().positive(),
   },
@@ -26,13 +34,15 @@ module.exports = function installProductRouter(app) {
 
   router.get(
     "/",
-    validate(getAllProducts.validationscheme),
-    getAllProducts);
+    validate(getAllProducts.validationScheme),
+    getAllProducts
+  );
   
   router.get(
     "/:id",
-    validate(getProductById.validationscheme),
-    getProductById);
+    validate(getProductById.validationScheme),
+    getProductById
+  );
 
   app.use(router.routes()).use(router.allowedMethods());
 };
