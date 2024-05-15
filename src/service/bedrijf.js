@@ -26,8 +26,58 @@ const getBedrijfByLeverancierId = async (id) => {
   return bedrijf;
 };
 
+const getById = async (id, gebruikerId) => {
+  const bedrijf = await bedrijfRepository.getById(id, gebruikerId);
+  if(!bedrijf || 
+    (bedrijf.KLANT_GEBRUIKERID !== gebruikerId && 
+      bedrijf.LEVERANCIER_GERBUIKERID !== gebruikerId)
+    ){
+        throw ServiceError.notFound(
+          `Geen bedrijf met id ${id} voor klant/leverancier ${gebruikerId}`, {id, gebruikerId}
+        );
+      }
+  return bedrijf;
+}
+
+const updateById = async (
+  id, 
+  {
+    NAAM, 
+    BTWNR, 
+    EMAILADRES, 
+    LOGO, 
+    REKENINGNUMMER, 
+    SECTOR, 
+    TELEFOONNUMMER, 
+    LAND, 
+    POSTCODE, 
+    STAD, 
+    STRAAT, 
+    STRAATNR
+  }
+) => {
+  try{
+    await bedrijfRepository.updateById(id, {
+      NAAM, 
+      BTWNR, 
+      EMAILADRES, 
+      LOGO, 
+      REKENINGNUMMER, 
+      SECTOR, 
+      TELEFOONNUMMER, 
+      LAND, 
+      POSTCODE, 
+      STAD, 
+      STRAAT, 
+      STRAATNR
+    });
+  } catch (error){
+    throw error;
+  }
+};
+
 module.exports = {
   getAllBedrijven,
-  getBedrijfByKlantId,
-  getBedrijfByLeverancierId,
+  getById,
+  updateById,
 };
