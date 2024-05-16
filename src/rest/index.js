@@ -3,8 +3,7 @@ const installHealthRouter = require("./health");
 const installGebruikerRouter = require("./gebruiker");
 const installProductRouter = require("./products");
 const installBestellingRouter = require("./bestelling");
-const installBedrijfKlantRouter = require("./bedrijfK");
-const installBedrijfLeverancierRouter = require("./bedrijfL");
+const installBedrijfRouter = require("./bedrijf");
 const installNotificatieRouter = require("./notificatie");
 //TODO : hier komen andere routes naar de DB-data vb gebruiker/product/bedrijf/etc
 
@@ -22,8 +21,7 @@ module.exports = (app) => {
   installGebruikerRouter(router);
   installProductRouter(router);
   installBestellingRouter(router);
-  installBedrijfKlantRouter(router);
-  installBedrijfLeverancierRouter(router);
+  installBedrijfRouter(router);
   installNotificatieRouter(router);
 
   app.use(router.routes()).use(router.allowedMethods());

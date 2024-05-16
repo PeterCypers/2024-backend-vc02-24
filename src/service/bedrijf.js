@@ -10,30 +10,11 @@ const getAllBedrijven = async () => {
   };
 };
 
-const getBedrijfByKlantId = async (id) => {
-  const bedrijf = await bedrijfRepository.findByKlantId(id);
-  if(!bedrijf) {
-    throw ServiceError.notFound(`No company with id ${id} exists`, {id});
-  }
-  return bedrijf;
-}
-
-const getBedrijfByLeverancierId = async (id) => {
-  const bedrijf = await bedrijfRepository.findByLeverancierId(id);
-  if(!bedrijf) {
-    throw ServiceError.notFound(`No company with id ${id} exists`, {id});
-  }
-  return bedrijf;
-};
-
-const getById = async (id, gebruikerId) => {
-  const bedrijf = await bedrijfRepository.getById(id, gebruikerId);
-  if(!bedrijf || 
-    (bedrijf.KLANT_GEBRUIKERID !== gebruikerId && 
-      bedrijf.LEVERANCIER_GERBUIKERID !== gebruikerId)
-    ){
+const getById = async (gebruikerId) => {
+  const bedrijf = await bedrijfRepository.getById(gebruikerId);
+  if(!bedrijf){
         throw ServiceError.notFound(
-          `Geen bedrijf met id ${id} voor klant/leverancier ${gebruikerId}`, {id, gebruikerId}
+          `Geen bedrijf met id ${gebruikerId} voor klant/leverancier`, { gebruikerId}
         );
       }
   return bedrijf;

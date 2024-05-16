@@ -5,17 +5,9 @@ const findAll = () => {
   return getKnex()(tables.bedrijf).select("*");
 };
 
-const findByKlantId = (id) => {
-  return getKnex()(tables.bedrijf).where("KLANT_GEBRUIKERID", id).first();
-};
-
-const findByLeverancierId = (id) => {
-  return getKnex()(tables.bedrijf).where("LEVERANCIER_GEBRUIKERID", id).first();
-};
-
-const getById = async (id, gebruikerId) => {
-  return getKnex()(tables.bedrijf).where(`${tables.bedrijf}.KLANT_GERBUIKERID`, gebruikerId)
-  .orWhere(`${tables.bedrijf}.LEVERANCIER_GEBRUIKERID`, gebruikerId)
+const getById = async (gebruikerId) => {
+  return getKnex()(tables.bedrijf).where(`KLANT_GEBRUIKERID`, gebruikerId)
+  .orWhere(`LEVERANCIER_GEBRUIKERID`, gebruikerId)
   .first();
 }
 
