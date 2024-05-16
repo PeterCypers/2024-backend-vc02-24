@@ -23,34 +23,34 @@ const getById = async (gebruikerId) => {
 const updateById = async (
   id, 
   {
-    NAAM, 
-    BTWNR, 
-    EMAILADRES, 
-    LOGO, 
-    REKENINGNUMMER, 
-    SECTOR, 
-    TELEFOONNUMMER, 
-    LAND, 
-    POSTCODE, 
-    STAD, 
-    STRAAT, 
-    STRAATNR
+    naam, 
+    btwNr, 
+    emailadres, 
+    logo, 
+    rekeningnummer, 
+    sector, 
+    telefoonnummer, 
+    land, 
+    postcode, 
+    stad, 
+    straat, 
+    straatnr
   }
 ) => {
   try{
     await bedrijfRepository.updateById(id, {
-      NAAM, 
-      BTWNR, 
-      EMAILADRES, 
-      LOGO, 
-      REKENINGNUMMER, 
-      SECTOR, 
-      TELEFOONNUMMER, 
-      LAND, 
-      POSTCODE, 
-      STAD, 
-      STRAAT, 
-      STRAATNR
+      naam, 
+      btwNr, 
+      emailadres, 
+      logo, 
+      rekeningnummer, 
+      sector, 
+      telefoonnummer, 
+      land, 
+      postcode, 
+      stad, 
+      straat, 
+      straatnr
     });
   } catch (error){
     throw error;

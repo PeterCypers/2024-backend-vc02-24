@@ -14,36 +14,37 @@ const getById = async (gebruikerId) => {
 const updateById = async (
   id,
   {
-    NAAM, 
-    BTWNR, 
-    EMAILADRES, 
-    LOGO, 
-    REKENINGNUMMER, 
-    SECTOR, 
-    TELEFOONNUMMER, 
-    LAND, 
-    POSTCODE, 
-    STAD, 
-    STRAAT, 
-    STRAATNR
+    naam, 
+    btwNr, 
+    emailadres, 
+    logo, 
+    rekeningnummer, 
+    sector, 
+    telefoonnummer, 
+    land, 
+    postcode, 
+    stad, 
+    straat, 
+    straatnr
   }
 ) => {
   try {
     await getKnex()(tables.bedrijf)
-      .where("BEDRIJFID", id)
+      .where("KLANT_GEBRUIKERID", id)
+      .orWhere("LEVERANCIER_GEBRUIKERID", id)
       .update({
-        NAAM: NAAM, 
-        BTWNR: BTWNR, 
-        EMAILADRES: EMAILADRES, 
-        LOGO: LOGO, 
-        REKENINGNUMMER: REKENINGNUMMER, 
-        SECTOR: SECTOR, 
-        TELEFOONNUMMER: TELEFOONNUMMER, 
-        LAND: LAND, 
-        POSTCODE: POSTCODE, 
-        STAD: STAD, 
-        STRAAT: STRAAT, 
-        STRAATNR: STRAATNR,
+        NAAM: naam, 
+        BTWNR: btwNr, 
+        EMAILADRES: emailadres, 
+        LOGO: logo, 
+        REKENINGNUMMER: rekeningnummer, 
+        SECTOR: sector, 
+        TELEFOONNUMMER: telefoonnummer, 
+        LAND: land, 
+        POSTCODE: postcode, 
+        STAD: stad, 
+        STRAAT: straat, 
+        STRAATNR: straatnr,
   })
 } catch(error){
   getLogger().error("Error in bedrijf.updateById", {

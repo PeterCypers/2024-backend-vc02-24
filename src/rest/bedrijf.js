@@ -1,18 +1,18 @@
-const befrijfService = require("../service/bedrijf");
+const bedrijfService = require("../service/bedrijf");
 const Joi = require('joi');
 const validate = require('../core/validation');
 const Router = require("@koa/router");
 const { requireAuthentication } = require('../core/auth');
 
 const getAllBedrijven = async (ctx) => {
-  const { data, count } = await befrijfService.getAllBedrijven();
+  const { data, count } = await bedrijfService.getAllBedrijven();
   ctx.body = { data, count };
 };
 getAllBedrijven.validationScheme = null;
 
 const getBedrijfById = async (ctx) => {
   const { gebruikerId } = ctx.state.session;
-  ctx.body = await befrijfService.getById(
+  ctx.body = await bedrijfService.getById(
     ctx.params.id,
     gebruikerId,
   );
@@ -24,11 +24,12 @@ getBedrijfById.validationScheme = {
 };
 
 const updateBedrijfById = async (ctx) => {
-  ctx.body = await befrijfService.updateById(
+  ctx.body = await bedrijfService.updateById(
     ctx.params.id, 
-    ctx.body
+    ctx.request.body
   );
 };
+console.log("hier");
 updateBedrijfById.validationScheme = {
   params: {
     id: Joi.number().integer().positive(),
@@ -37,9 +38,9 @@ updateBedrijfById.validationScheme = {
     naam: Joi.string(), 
     btwNr: Joi.string(), 
     emailadres: Joi.string().email(), 
-    logo: Joi.string(), 
+    logo: Joi.string().uri(), 
     rekeningnummer: Joi.string(), 
-    sector: Joi.string().uri(), 
+    sector: Joi.string(), 
     telefoonnummer: Joi.string(), 
     land: Joi.string(), 
     postcode: Joi.string(), 
