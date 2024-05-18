@@ -110,8 +110,6 @@ const updateAllLeverancier = async (gebruikerId) => {
     })
   ));
 
-  console.log(notificaties);
-
   if (notificaties.length == 0)
     return 0;
   
@@ -144,9 +142,28 @@ const updateById = async (id, { gebruikerId, orderId, datum, notificatieStatus, 
   }
 }
 
+const maakAllOngelezen = async (id) => {
+  try {
+    await getKnex()(tables.notificatie)
+      .where({
+        NOTIFICATIESTATUS: 'nieuw',
+        GEBRUIKERID: id
+      })
+      .update({
+        NOTIFICATIESTATUS: 'ongelezen'
+      });
+  } catch (error) {
+    getLogger().error(`Error bij het zetten van ongelezen notificaties voor gebruikerId ${id}:`, {
+      error,
+    });
+    throw error;
+  }
+}
+
 module.exports = {
   getAll,
   updateAllKlant,
   updateAllLeverancier,
   updateById,
+  maakAllOngelezen,
 };

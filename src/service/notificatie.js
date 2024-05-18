@@ -28,7 +28,7 @@ const updateAll = async (gebruikerId, rol) => {
   }
 };
 
-const updateById = async(id, notificatie) => {
+const updateById = async (id, notificatie) => {
   try {
     const result = await notificatieRepository.updateById(id, notificatie);
 
@@ -39,10 +39,19 @@ const updateById = async(id, notificatie) => {
   } catch (error) {
     throw handleDBError(error);
   }
-}
+};
+
+const maakAllOngelezen = async (id) => {
+  try {
+    await notificatieRepository.maakAllOngelezen(id);
+  } catch (error) {
+    throw handleDBError(error);
+  }
+};
 
 module.exports = {
   getAll,
   updateAll,
   updateById,
+  maakAllOngelezen,
 };

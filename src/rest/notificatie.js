@@ -39,6 +39,12 @@ updateById.validationScheme = {
   },
 };
 
+const maakAllOngelezen = async (ctx) => {
+  const { gebruikerId } = ctx.state.session;
+  await notificatieService.maakAllOngelezen(gebruikerId);
+  ctx.status = 204;
+}
+
 module.exports = (app) => {
   const router = new Router({
     prefix: "/notificaties",
@@ -47,6 +53,7 @@ module.exports = (app) => {
   router.get("/", requireAuthentication, validate(getAll.validationScheme), getAll);
   router.post("/", requireAuthentication, updateAll);
   router.put("/:id", requireAuthentication, validate(updateById.validationScheme), updateById);
+  router.post("/maakOngelezen", requireAuthentication, maakAllOngelezen);
 
   app.use(router.routes()).use(router.allowedMethods());
 };
