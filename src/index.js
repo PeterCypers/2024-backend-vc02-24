@@ -1,4 +1,4 @@
-const createServer = require('./createServer');
+const createServer = require("./createServer");
 
 async function main() {
   try {
@@ -10,8 +10,8 @@ async function main() {
       process.exit(0);
     }
 
-    process.on('SIGTERM', onClose);
-    process.on('SIGQUIT', onClose);
+    process.on("SIGTERM", onClose);
+    process.on("SIGQUIT", onClose);
   } catch (error) {
     console.error(error);
     process.exit(-1);

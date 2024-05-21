@@ -1,22 +1,21 @@
-const Router = require('@koa/router');
-const Joi = require('joi');
-const gebruikerService = require('../service/gebruiker');
-const validate = require('../core/validation');
-const { requireAuthentication, makeRequireRole } = require('../core/auth');
-const Role = require('../core/roles');
+const Router = require("@koa/router");
+const Joi = require("joi");
+const gebruikerService = require("../service/gebruiker");
+const validate = require("../core/validation");
+const { requireAuthentication, makeRequireRole } = require("../core/auth");
+const Role = require("../core/roles");
 
 const checkGebruikerId = (ctx, next) => {
   const { gebruikerId, rol } = ctx.state.session;
   const { id } = ctx.params;
-
   // You can only get our own data unless you're an admin
-  if (id !== gebruikerId && rol !== Role.ADMINISTRATOR) {
+  if (id != gebruikerId && rol !== Role.ADMINISTRATOR) {
     return ctx.throw(
       403,
-      'You are not allowed to view this gebruiker\'s information',
+      "You are not allowed to view this gebruiker's information",
       {
-        code: 'FORBIDDEN',
-      },
+        code: "FORBIDDEN",
+      }
     );
   }
   return next();
@@ -62,13 +61,18 @@ register.validationScheme = {
     emailadres: Joi.string().email(),
     wachtwoord: Joi.string().max(255),
     naam: Joi.string().max(255),
-    rol: Joi.string().valid('KLANT', 'LEVERANCIER', 'ADMINISTRATOR'),
-    isActief: Joi.number().valid(0, 1)
+    rol: Joi.string().valid("KLANT", "LEVERANCIER", "ADMINISTRATOR"),
+    isActief: Joi.number().valid(0, 1),
   },
 };
 
 const updateGebruikerById = async (ctx) => {
-  const gebruiker = await gebruikerService.updateById(ctx.params.id, ctx.request.body);
+  console.log(ctx.body);
+  console.log(ctx.body);
+  const gebruiker = await gebruikerService.updateById(
+    ctx.params.id,
+    ctx.request.body
+  );
   ctx.status = 200;
   ctx.body = gebruiker;
 };
@@ -80,8 +84,8 @@ updateGebruikerById.validationScheme = {
     emailadres: Joi.string().email(),
     wachtwoord: Joi.string().max(255),
     naam: Joi.string().max(255),
-    rol: Joi.string().valid('KLANT', 'LEVERANCIER', 'ADMINISTRATOR'),
-    isActief: Joi.number().valid(0, 1)
+    rol: Joi.string().valid("KLANT", "LEVERANCIER", "ADMINISTRATOR").optional(),
+    isActief: Joi.number().valid(0, 1).optional(),
   },
 };
 
@@ -97,19 +101,15 @@ deleteGebruikerById.validationScheme = {
 
 module.exports = function installGebruikerRouter(app) {
   const router = new Router({
-    prefix: '/gebruikers',
+    prefix: "/gebruikers",
   });
 
   // public routes
-  router.post(
-    '/login',
-    validate(login.validationScheme),
-    login,
-  );
+  router.post("/login", validate(login.validationScheme), login);
 
   // authentication routes
   router.get(
-    '/:id',
+    "/:id",
     requireAuthentication,
     validate(getGebruikerById.validationScheme),
     checkGebruikerId,
@@ -119,28 +119,29 @@ module.exports = function installGebruikerRouter(app) {
   // admin routes
   const requireAdmin = makeRequireRole(Role.ADMINISTRATOR);
   router.get(
-    '/',
+    "/",
     requireAuthentication,
     requireAdmin,
     validate(getAllGebruikers.validationScheme),
     getAllGebruikers
   );
   router.post(
-    '/register',
+    "/register",
     requireAuthentication,
     requireAdmin,
     validate(register.validationScheme),
-    register,
+    register
   );
   router.put(
-    '/:id',
+    "/:id",
     requireAuthentication,
-    requireAdmin,
+    //requireAdmin,
+    checkGebruikerId,
     validate(updateGebruikerById.validationScheme),
     updateGebruikerById
   );
   router.delete(
-    '/:id',
+    "/:id",
     requireAuthentication,
     requireAdmin,
     validate(deleteGebruikerById.validationScheme),
