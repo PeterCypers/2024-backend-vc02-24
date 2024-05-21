@@ -7,11 +7,11 @@ const getByOrderId = (id) => {
     .first();
 };
 
-const updateById = async (id, { isAfgehandeld }) => {
+const updateById = async (id) => {
   try {
     await getKnex()(tables.betaling)
       .update({
-        ISAFGEHANDELD: isAfgehandeld,
+        ISAFGEHANDELD: 1,
       })
       .where("ORDERID", id);
     return id;

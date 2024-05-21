@@ -11,9 +11,9 @@ const getByOrderId = async (id) => {
   return betaling;
 };
 
-const updateById = async (id, { isAfgehandeld }) => {
+const updateById = async (id) => {
   try {
-    await betalingRepository.updateById(id, { isAfgehandeld });
+    await betalingRepository.updateById(id);
     return getByOrderId(id);
   } catch (error) {
     throw handleDBError(error);

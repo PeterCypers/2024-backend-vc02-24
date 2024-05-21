@@ -17,9 +17,7 @@ getByOrderId.validationScheme = {
 };
 
 const updateById = async (ctx) => {
-  ctx.body = await betalingService.updateById(ctx.params.id, {
-    ...ctx.request.body,
-  });
+  ctx.body = await betalingService.updateById(ctx.params.id);
 };
 
 module.exports = (app) => {
