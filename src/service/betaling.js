@@ -11,15 +11,6 @@ const getByOrderId = async (id) => {
   return betaling;
 };
 
-const updateById = async (id) => {
-  try {
-    await betalingRepository.updateById(id);
-    return getByOrderId(id);
-  } catch (error) {
-    throw handleDBError(error);
-  }
-};
-
 const create = async (ORDERID) => {
   try {
     await betalingRepository.create({ ORDERID });
@@ -30,6 +21,5 @@ const create = async (ORDERID) => {
 
 module.exports = {
   getByOrderId,
-  updateById,
   create,
 };

@@ -7,20 +7,6 @@ const getByOrderId = (id) => {
     .first();
 };
 
-const updateById = async (id) => {
-  try {
-    await getKnex()(tables.betaling)
-      .update({
-        ISAFGEHANDELD: 1,
-      })
-      .where("ORDERID", id);
-    return id;
-  } catch (error) {
-    getLogger().error("Error is updateById", { error });
-    throw error;
-  }
-};
-
 const create = async ({ ORDERID }) => {
   try {
     await getKnex()(tables.betaling)
@@ -40,6 +26,5 @@ const create = async ({ ORDERID }) => {
 
 module.exports = {
   getByOrderId,
-  updateById,
   create,
 };
