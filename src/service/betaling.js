@@ -20,7 +20,16 @@ const updateById = async (id) => {
   }
 };
 
+const create = async (ORDERID) => {
+  try {
+    await betalingRepository.create({ ORDERID });
+  } catch (error) {
+    throw handleDBError(error);
+  }
+};
+
 module.exports = {
   getByOrderId,
   updateById,
+  create,
 };

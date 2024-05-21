@@ -20,6 +20,11 @@ const updateById = async (ctx) => {
   ctx.body = await betalingService.updateById(ctx.params.id);
 };
 
+const create = async (ctx) => {
+  ctx.body = await betalingService.create({ ...ctx.request.body });
+  console.log(ctx.request.body);
+};
+
 module.exports = (app) => {
   const router = new Router({
     prefix: "/betaling",
@@ -32,6 +37,7 @@ module.exports = (app) => {
     getByOrderId
   );
   router.put("/:id", requireAuthentication, updateById);
+  router.post("/", requireAuthentication, create);
 
   app.use(router.routes()).use(router.allowedMethods());
 };
