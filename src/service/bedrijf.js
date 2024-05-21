@@ -10,24 +10,55 @@ const getAllBedrijven = async () => {
   };
 };
 
-const getBedrijfByKlantId = async (id) => {
-  const bedrijf = await bedrijfRepository.findByKlantId(id);
-  if(!bedrijf) {
-    throw ServiceError.notFound(`No company with id ${id} exists`, {id});
-  }
+const getById = async (gebruikerId) => {
+  const bedrijf = await bedrijfRepository.getById(gebruikerId);
+  if(!bedrijf){
+        throw ServiceError.notFound(
+          `Geen bedrijf met id ${gebruikerId} voor klant/leverancier`, { gebruikerId}
+        );
+      }
   return bedrijf;
 }
 
-const getBedrijfByLeverancierId = async (id) => {
-  const bedrijf = await bedrijfRepository.findByLeverancierId(id);
-  if(!bedrijf) {
-    throw ServiceError.notFound(`No company with id ${id} exists`, {id});
+const updateById = async (
+  id, 
+  {
+    naam, 
+    btwNr, 
+    emailadres, 
+    logo, 
+    rekeningnummer, 
+    sector, 
+    telefoonnummer, 
+    land, 
+    postcode, 
+    stad, 
+    straat, 
+    straatnr
   }
-  return bedrijf;
+) => {
+  try{
+    await bedrijfRepository.updateById(id, {
+      naam, 
+      btwNr, 
+      emailadres, 
+      logo, 
+      rekeningnummer, 
+      sector, 
+      telefoonnummer, 
+      land, 
+      postcode, 
+      stad, 
+      straat, 
+      straatnr
+    });
+  } catch (error){
+    throw error;
+  }
 };
 
 module.exports = {
   getAllBedrijven,
-  getBedrijfByKlantId,
-  getBedrijfByLeverancierId,
+  getById,
+  updateById,
 };
