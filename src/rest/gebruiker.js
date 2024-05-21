@@ -67,8 +67,6 @@ register.validationScheme = {
 };
 
 const updateGebruikerById = async (ctx) => {
-  console.log(ctx.body);
-  console.log(ctx.body);
   const gebruiker = await gebruikerService.updateById(
     ctx.params.id,
     ctx.request.body
