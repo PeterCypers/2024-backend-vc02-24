@@ -1,6 +1,6 @@
 const { getLogger } = require("../core/logging");
 const { tables, getKnex } = require("../data");
-const Role = require('../core/roles');
+const Role = require("../core/roles");
 
 const SELECT_COLUMS = [
   `${tables.bestelling}.ORDERID`,
@@ -33,6 +33,11 @@ const SELECT_COLUMS = [
   `b2.LOGO as LEVERANCIER_BEDRIJF_LOGO`,
   `b2.REKENINGNUMMER as LEVERANCIER_BEDRIJF_REKENINGNUMMER`,
   `b2.SECTOR as LEVERANCIER_BEDRIJF_SECTOR`,
+  `b2.LAND as LEVERANCIER_BEDRIJF_LAND`,
+  `b2.POSTCODE as LEVERANCIER_BEDRIJF_POSTCODE`,
+  `b2.STAD as LEVERANCIER_BEDRIJF_STAD`,
+  `b2.STRAAT as LEVERANCIER_BEDRIJF_STRAAT`,
+  `b2.STRAATNR as LEVERANCIER_BEDRIJF_STRAATNR`,
 
   `${tables.product}.NAAM as PRODUCT_NAAM`,
   `${tables.product}.EENHEIDSPRIJS as PRODUCT_EENHEIDSPRIJS`,
@@ -64,6 +69,11 @@ const formatBestelling = ({
   LEVERANCIER_BEDRIJF_LOGO,
   LEVERANCIER_BEDRIJF_REKENINGNUMMER,
   LEVERANCIER_BEDRIJF_SECTOR,
+  LEVERANCIER_BEDRIJF_LAND,
+  LEVERANCIER_BEDRIJF_POSTCODE,
+  LEVERANCIER_BEDRIJF_STAD,
+  LEVERANCIER_BEDRIJF_STRAAT,
+  LEVERANCIER_BEDRIJF_STRAATNR,
 
   PRODUCTEN,
 
@@ -95,6 +105,11 @@ const formatBestelling = ({
     LEVERANCIER_BEDRIJF_LOGO,
     LEVERANCIER_BEDRIJF_REKENINGNUMMER,
     LEVERANCIER_BEDRIJF_SECTOR,
+    LEVERANCIER_BEDRIJF_LAND,
+    LEVERANCIER_BEDRIJF_POSTCODE,
+    LEVERANCIER_BEDRIJF_STAD,
+    LEVERANCIER_BEDRIJF_STRAAT,
+    LEVERANCIER_BEDRIJF_STRAATNR,
   },
   producten: PRODUCTEN.map((product) => ({
     PRODUCT_NAAM: product.PRODUCT_NAAM,
@@ -104,7 +119,16 @@ const formatBestelling = ({
   })),
 });
 
-const getAll = async (gebruikerId, rol, limit, offset, filterValues, filterFields, order, orderField) => {
+const getAll = async (
+  gebruikerId,
+  rol,
+  limit,
+  offset,
+  filterValues,
+  filterFields,
+  order,
+  orderField
+) => {
   const totalCountQuery = await getKnex()(tables.bestelling)
     .select(`${tables.bestelling}.ORDERID`)
     .distinct()
@@ -158,14 +182,17 @@ const getAll = async (gebruikerId, rol, limit, offset, filterValues, filterField
       `${tables.product}.PRODUCTID`
     )
     .where((queryBuilder) => {
-      queryBuilder.where(`${tables.bestelling}.KLANT_GEBRUIKERID`, gebruikerId)
+      queryBuilder
+        .where(`${tables.bestelling}.KLANT_GEBRUIKERID`, gebruikerId)
         .orWhere(`${tables.bestelling}.LEVERANCIER_GEBRUIKERID`, gebruikerId);
       if (filterFields?.length) {
         filterFields.forEach((field, index) => {
           const filter = filterValues[index];
           let tableField;
           if (field === "BEDRIJF_NAAM") {
-            tableField = `${rol == Role.LEVERANCIER ? tables.klant : tables.leverancier}.${field}`;
+            tableField = `${
+              rol == Role.LEVERANCIER ? tables.klant : tables.leverancier
+            }.${field}`;
           } else {
             tableField = `${tables.bestelling}.${field}`;
           }
@@ -232,12 +259,12 @@ const getAll = async (gebruikerId, rol, limit, offset, filterValues, filterField
     )
     .select(SELECT_COLUMS)
     .where((queryBuilder) => {
-      queryBuilder.where(`${tables.bestelling}.KLANT_GEBRUIKERID`, gebruikerId)
+      queryBuilder
+        .where(`${tables.bestelling}.KLANT_GEBRUIKERID`, gebruikerId)
         .orWhere(`${tables.bestelling}.LEVERANCIER_GEBRUIKERID`, gebruikerId);
     })
     .andWhere((queryBuilder) => {
-      if (!filterFields?.length)
-        return true;
+      if (!filterFields?.length) return true;
 
       filterFields.forEach((field, index) => {
         const filter = filterValues[index];
@@ -246,7 +273,9 @@ const getAll = async (gebruikerId, rol, limit, offset, filterValues, filterField
 
         let tableField;
         if (field === "BEDRIJF_NAAM") {
-          tableField = `${rol == Role.LEVERANCIER ? tables.klant : tables.leverancier}.${field}`;
+          tableField = `${
+            rol == Role.LEVERANCIER ? tables.klant : tables.leverancier
+          }.${field}`;
         } else {
           tableField = `${tables.bestelling}.${field}`;
         }
@@ -266,7 +295,8 @@ const getAll = async (gebruikerId, rol, limit, offset, filterValues, filterField
 
       let orderTable;
       if (orderField === "BEDRIJF_NAAM") {
-        orderTable = rol == Role.LEVERANCIER ? tables.klant : tables.leverancier;
+        orderTable =
+          rol == Role.LEVERANCIER ? tables.klant : tables.leverancier;
       } else {
         orderTable = tables.bestelling;
       }
@@ -294,12 +324,9 @@ const getAll = async (gebruikerId, rol, limit, offset, filterValues, filterField
   const startIndex = offset ? offset : 0;
   const eindIndex = limit ? Number(offset) + Number(limit) : 100;
 
-  const items = Array.from(bestellingenMap.values()).map(
-    formatBestelling
-  ).slice(
-    startIndex,
-    eindIndex
-  );
+  const items = Array.from(bestellingenMap.values())
+    .map(formatBestelling)
+    .slice(startIndex, eindIndex);
 
   return { count, items };
 };
