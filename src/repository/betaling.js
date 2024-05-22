@@ -7,12 +7,17 @@ const getByOrderId = (id) => {
     .first();
 };
 
-const create = async ({ ORDERID }) => {
+const create = async (ORDERID) => {
   try {
-    await getKnex()(tables.betaling).insert({
-      ORDERID: ORDERID,
-      ISAFGEHANDELD: 0,
-    });
+    await getKnex()(tables.betaling)
+      .insert({
+        ORDERID: ORDERID,
+        ISAFGEHANDELD: 0,
+      })
+      .onConflict("ORDERID")
+      .merge({
+        ISAFGEHANDELD: 0,
+      });
   } catch (error) {
     getLogger().error("Error in betaling.create", { error });
     throw error;

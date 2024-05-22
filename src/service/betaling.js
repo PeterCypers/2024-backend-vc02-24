@@ -11,9 +11,9 @@ const getByOrderId = async (id) => {
   return betaling;
 };
 
-const create = async (ORDERID) => {
+const create = async ({ ORDERID }) => {
   try {
-    await betalingRepository.create({ ORDERID });
+    await betalingRepository.create(ORDERID);
   } catch (error) {
     throw handleDBError(error);
   }
