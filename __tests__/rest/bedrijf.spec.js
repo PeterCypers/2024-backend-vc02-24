@@ -36,15 +36,23 @@ describe("Bedrijven", () => {
     await server.stop();
   });
 
-  const leverancierurl = '/api/levcompanydetails';
-  const klanturl = '/api/cstcompanydetails';
+  const leverancierurl = '/api/bedrijfsgegevens';
+  const klanturl = '/api/bedrijfsgegevens';
   //test get alle bedrijven (via leverancier)
-  describe('GET /api/levcompanydetails', () => {
+  describe('GET /api/bedrijfsgegevens', () => {
+
+    let sessieToken;
 
     //testdata toevoegen
     beforeAll(async () => {
       await knex(tables.gebruiker).insert(data.gebruikers);
       await knex(tables.bedrijf).insert(data.bedrijven);
+      const response = await request.post("/api/gebruikers/login").send({
+        email: "kim@gmail.com",
+        wachtwoord: "1234"
+      });
+
+      sessieToken = response.body.token;
     });
 
     //testdata verwijderen
@@ -55,7 +63,7 @@ describe("Bedrijven", () => {
 
     //test happy flow
     it('should return 200 and all bedrijven', async() => {
-      const response = await request.get(leverancierurl);
+      const response = await request.get(leverancierurl).set('Authorization', `Bearer ${sessieToken}`);
 
       expect(response.status).toBe(200);
       expect(response.body.data.length).toBe(2);
@@ -81,7 +89,7 @@ describe("Bedrijven", () => {
 
     //test bad request
     it('should 400 when given an argument', async () => {
-      const response = await request.get(`${leverancierurl}?invalid=true`);
+      const response = await request.get(`${leverancierurl}?invalid=true`).set('Authorization', `Bearer ${sessieToken}`);
 
       expect(response.statusCode).toBe(400);
       expect(response.body.code).toBe('VALIDATION_FAILED');
@@ -91,12 +99,20 @@ describe("Bedrijven", () => {
 
 
   //test getBedrijf op Klant ID
-  describe('GET /api/cstcompanydetails/:id', () => {
+  describe('GET /api/bedrijfsgegevens/:id', () => {
+
+    let sessieToken;
 
     //testdata toevoegen
     beforeAll(async () => {
       await knex(tables.gebruiker).insert(data.gebruikers);
       await knex(tables.bedrijf).insert(data.bedrijven);
+      const response = await request.post("/api/gebruikers/login").send({
+        email: "mark@outlook.be",
+        wachtwoord: "1234"
+      });
+
+      sessieToken = response.body.token;
     });
 
     //testdata verwijderen
@@ -107,7 +123,7 @@ describe("Bedrijven", () => {
 
     //test
     it('should 200 and return the requested company', async () => {
-      const response = await request.get(`${klanturl}/1`);
+      const response = await request.get(`${klanturl}/1`).set('Authorization', `Bearer ${sessieToken}`);
     
       expect(response.statusCode).toBe(200);
       expect(response.body).toEqual({
@@ -130,21 +146,21 @@ describe("Bedrijven", () => {
     });
 
     it('should 404 when requesting non existing company', async () => {
-      const response = await request.get(`${klanturl}/500`);
+      const response = await request.get(`${klanturl}/500`).set('Authorization', `Bearer ${sessieToken}`);
 
       expect(response.statusCode).toBe(404);
       expect(response.body).toMatchObject({
         code: 'NOT_FOUND',
-        message: 'No company with id 500 exists',
+        message: 'Geen bedrijf met id 500 voor klant/leverancier',
         details: {
-          id: 500,
+          gebruikerId: 500,
         },
       });
       expect(response.body.stack).toBeTruthy();
     });
 
     it('should 400 with invalid company id', async () => {
-      const response = await request.get(`${klanturl}/invalid`);
+      const response = await request.get(`${klanturl}/invalid`).set('Authorization', `Bearer ${sessieToken}`);
 
       expect(response.statusCode).toBe(400);
       expect(response.body.code).toBe('VALIDATION_FAILED');
@@ -153,12 +169,20 @@ describe("Bedrijven", () => {
   });
 
   //test getBedrijf op Leverancier ID
-  describe('GET /api/levcompanydetails/:id', () => {
+  describe('GET /api/bedrijfsgegevens/:id', () => {
+
+    let sessieToken;
 
     //testdata toevoegen
     beforeAll(async () => {
       await knex(tables.gebruiker).insert(data.gebruikers);
       await knex(tables.bedrijf).insert(data.bedrijven);
+      const response = await request.post("/api/gebruikers/login").send({
+        email: "mark@outlook.be",
+        wachtwoord: "1234"
+      });
+
+      sessieToken = response.body.token;
     });
 
     //testdata verwijderen
@@ -169,7 +193,7 @@ describe("Bedrijven", () => {
 
     //test
     it('should 200 and return the requested company', async () => {
-      const response = await request.get(`${leverancierurl}/4`);
+      const response = await request.get(`${leverancierurl}/4`).set('Authorization', `Bearer ${sessieToken}`);
     
       expect(response.statusCode).toBe(200);
       expect(response.body).toEqual({
@@ -192,21 +216,21 @@ describe("Bedrijven", () => {
     });
 
     it('should 404 when requesting non existing company', async () => {
-      const response = await request.get(`${leverancierurl}/500`);
+      const response = await request.get(`${leverancierurl}/500`).set('Authorization', `Bearer ${sessieToken}`);
 
       expect(response.statusCode).toBe(404);
       expect(response.body).toMatchObject({
         code: 'NOT_FOUND',
-        message: 'No company with id 500 exists',
+        message: 'Geen bedrijf met id 500 voor klant/leverancier',
         details: {
-          id: 500,
+          gebruikerId: 500,
         },
       });
       expect(response.body.stack).toBeTruthy();
     });
 
     it('should 400 with invalid company id', async () => {
-      const response = await request.get(`${leverancierurl}/invalid`);
+      const response = await request.get(`${leverancierurl}/invalid`).set('Authorization', `Bearer ${sessieToken}`);
 
       expect(response.statusCode).toBe(400);
       expect(response.body.code).toBe('VALIDATION_FAILED');
