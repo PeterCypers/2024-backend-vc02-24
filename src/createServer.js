@@ -1,13 +1,13 @@
-const config = require('config');
-const Koa = require('koa');
-const { initializeLogger, getLogger } = require('./core/logging');
-const installRest = require('./rest');
-const { initializeData, shutdownData } = require('./data'); //TODO
-const installMiddleware = require('./core/installMiddleware');
+const config = require("config");
+const Koa = require("koa");
+const { initializeLogger, getLogger } = require("./core/logging");
+const installRest = require("./rest");
+const { initializeData, shutdownData } = require("./data"); //TODO
+const installMiddleware = require("./core/installMiddleware");
 
-const NODE_ENV = config.get('env');
-const LOG_LEVEL = config.get('log.level');
-const LOG_DISABLED = config.get('log.disabled');
+const NODE_ENV = config.get("env");
+const LOG_LEVEL = config.get("log.level");
+const LOG_DISABLED = config.get("log.disabled");
 
 module.exports = async function createServer() {
   initializeLogger({
@@ -33,17 +33,17 @@ module.exports = async function createServer() {
 
     start() {
       return new Promise((resolve) => {
-        app.listen(9000, () => {
-          getLogger().info('🚀 Server listening on http://localhost:9000');
-          resolve();
-        });
+        const port = config.get("port");
+        app.listen(port);
+        getLogger().info(`🚀 Server listening on http://localhost:${port}`);
+        resolve();
       });
     },
 
     async stop() {
       app.removeAllListeners();
       await shutdownData();
-      getLogger().info('Goodbye! 👋');
+      getLogger().info("Goodbye! 👋");
     },
   };
 };
