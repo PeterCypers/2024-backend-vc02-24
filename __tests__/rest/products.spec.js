@@ -53,9 +53,9 @@ describe("Products", () => {
             const response = await request.get(url);
 
             expect(response.status).toBe(200);
-            expect(response.body.data.length).toBe(5);
+            expect(response.body.items.length).toBe(5);
 
-            expect(response.body.data).toEqual(expect.arrayContaining([{
+            expect(response.body.items).toEqual(expect.arrayContaining([{
                 productid: 1,
                 eenheidsprijs: 5.0,
                 levermethode: "STOCK",
