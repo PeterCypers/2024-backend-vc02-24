@@ -29,7 +29,7 @@ const updateBedrijfById = async (ctx) => {
     ctx.request.body
   );
 };
-console.log("hier");
+
 updateBedrijfById.validationScheme = {
   params: {
     id: Joi.number().integer().positive(),
