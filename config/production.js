@@ -5,7 +5,7 @@ module.exports = {
     disabled: false,
   },
   cors: {
-    origins: ["https://two024-frontend-vc02-24.onrender.com/"], // het adres waar je front-end op draait
+    origins: ["https://two024-frontend-vc02-24.onrender.com"], // het adres waar je front-end op draait
     maxAge: 3 * 60 * 60,
   },
   database: {
